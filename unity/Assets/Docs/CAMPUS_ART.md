@@ -1,0 +1,8 @@
+# Illustrated campus map
+
+Asset: `Assets/Art/Campus/campus-map.png`
+Generated with the built-in image_gen tool from the user's supplied visual reference on 2026-10-02. This active background is AI-assisted artwork, not a map supplied by Kenmi. Earlier Kenmi map assets and their license remain in the project.
+
+## Final generation prompt
+
+Create a production-ready 2D RPG campus background map, wide landscape 16:9, ideally 2048x1152. The attached image is the style and layout reference: match its lush detailed colorful pixel-art university campus. Maejo University Faculty of Science setting: upper-left large cream/off-white Maejo 60-year academic building with terracotta red accents and triangular pediment; upper-right cream modern Chulabhorn science building with curved terracotta bands and a small dinosaur statue at its entrance; lower-left beautiful pond and waterfall with wooden bridge; lower-right orange roofed Open House stage. Dense emerald/lime trees, flowers, benches, black lamp posts, agricultural sensor garden at right edge. Keep broad clear beige walkable paths: full horizontal main promenade at y=52% across image from x=8% to92%; vertical main path at x=50% from y=5% to95%; branch to left building at x=27% from y=30% to55%; branch to right building at x=74% from y=37% to55%; curved/wide path to stage from central crossing through x=73%,y=73%. Clear paths must all connect. No people, no NPCs, no lettering, no labels, no interface, no borders, no blank margins. Edge-to-edge finished map vegetation; consistent top-down 3/4 RPG perspective and detailed warm inviting pixel art, crisp architecture and harmonious light. Not a screenshot of a game: background art only.
