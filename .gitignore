@@ -11,3 +11,28 @@ generated/
 *.pem
 *.key
 !.env.example
+
+# Unity generated files and local editor state
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Bb]uild/
+[Bb]uilds/
+MemoryCaptures/
+Recordings/
+SceneBackups/
+*.csproj
+*.sln
+*.slnx
+*.pidb
+*.booproj
+*.user
+*.unitypackage
+.DS_Store
+mono_crash.*
+
+# Licensed source artwork is restored locally by authorized asset owners.
+unity/Assets/Art/ModernCampus/*.png
+unity/Assets/Resources/Battle/bug.png

@@ -1,3 +1,13 @@
 packages:
   - 'frontend'
   - 'backend'
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - prisma
+  - '@parcel/watcher'
+  - unrs-resolver
+allowBuilds:
+  '@parcel/watcher': set this to true or false
+  '@prisma/engines': set this to true or false
+  prisma: set this to true or false
+  unrs-resolver: set this to true or false
