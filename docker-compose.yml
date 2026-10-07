@@ -1,9 +1,9 @@
 # The Demo Subsystem runs its own API and its own database.
 # It never connects to the Core Hub database - only to the Core Hub API and JWKS URL.
 #
-#   docker compose up -d db              PostgreSQL only, for `pnpm dev` (port 5436)
+#   docker compose up -d db              PostgreSQL only (internal network)
 #   docker compose up -d --build         db + api + web, built the way the server runs them
-#                                        -> http://localhost:3203
+#                                        -> http://localhost:5012
 #
 # The server does not use this file. There DevOps runs the same two images against
 # the shared PostgreSQL (standards docs/deployment.md); this file stands in for that
@@ -92,6 +92,8 @@ services:
       TZ: Asia/Bangkok
     expose:
       - '3000'
+    ports:
+      - '5012:3000'
 
 volumes:
   csmju-csmju-game-introduce-db-data:
