@@ -2,7 +2,8 @@
 
 Validation performed on 2026-10-07 (Asia/Bangkok).
 
-- `run-all-checks`: 19/20 passed. GH-03 failed because the subsystem rename changes `.github/workflows/ci.yml` and `.github/CODEOWNERS`. DevOps review is required; no exception or bypass has been applied.
+- Initial `run-all-checks`: 19/20 passed. GH-03 failed because the subsystem rename changed `.github/workflows/ci.yml` and `.github/CODEOWNERS`.
+- On 2026-10-08, those two protected files were restored to `origin/main`. Their old subsystem/team identifiers require a separate DevOps update. No exception or bypass has been applied.
 - DEP-01 through DEP-04 passed.
 - Lint, typecheck, builds and 126 authentication unit tests passed.
 - `docker compose up -d --build` completed; db, api and web were healthy.
