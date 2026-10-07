@@ -16886,7 +16886,7 @@ MonoBehaviour:
   - {fileID: 274225105}
   blockedSurfaces:
   - {fileID: 2010003123}
-  coreHomeUrl: http://127.0.0.1:3100/
+  coreHomeUrl: /portal
   buildingInterior: {fileID: 943207215}
   interiorSpawn: {x: 110.5, y: -6.5}
   interiorCameraCenter: {x: 102.5, y: 1.5}

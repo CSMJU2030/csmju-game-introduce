@@ -34,7 +34,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     public Rect[] walkableAreas = Array.Empty<Rect>();
     public PolygonCollider2D[] walkableSurfaces = Array.Empty<PolygonCollider2D>();
     public PolygonCollider2D[] blockedSurfaces = Array.Empty<PolygonCollider2D>();
-    public string coreHomeUrl = "http://127.0.0.1:3100/";
+    public string coreHomeUrl = "/portal";
 #if UNITY_WEBGL && !UNITY_EDITOR
     [System.Runtime.InteropServices.DllImport("__Internal")]
     private static extern void CampusReturnToCore(string url);
