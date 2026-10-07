@@ -12,8 +12,8 @@ export default function OverviewPage() {
       <section className={`${cardClass} space-y-6 p-6`}>
         <h2 className="font-display text-headline-md">นักศึกษาใหม่ออกสำรวจโลก CS</h2>
         <p className="text-body-md text-on-surface-variant">สำรวจคณะ ห้องเรียน ห้องแล็บ และสวน IoT ผ่านเควสต์กับรุ่นพี่และอาจารย์ สะสม Skill Badges เพื่อปลดล็อก Open House Day</p>
-        <a className={primaryButtonClass} href="/auth/login?next=/">เข้าสู่ระบบผ่าน CSMJU Portal</a>
-        <p className="text-body-md text-on-surface-variant">ตัวเกม Unity อยู่ในโฟลเดอร์ unity/ และต้องเตรียม WebGL build ก่อนเปิดให้เล่นบน server</p>
+        <a className={primaryButtonClass} href="/play">เริ่มเล่น CSMJU Quest</a>
+        <p className="text-body-md text-on-surface-variant">เดินด้วย WASD หรือปุ่มลูกศร · คุยและเข้าตึกด้วย E · หยุดเกมด้วย Esc · เปิดเสียงหลังคลิกในเกม</p>
       </section>
     </>
   );

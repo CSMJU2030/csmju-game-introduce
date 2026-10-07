@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Unity-generated engine output is validated by the browser smoke test.
+    "public/game/Build/**",
   ]),
 ]);
 

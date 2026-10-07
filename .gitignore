@@ -36,3 +36,7 @@ mono_crash.*
 # Licensed source artwork is restored locally by authorized asset owners.
 unity/Assets/Art/ModernCampus/*.png
 unity/Assets/Resources/Battle/bug.png
+
+# Ship only the packaged playable WebGL build, not Unity build caches.
+!frontend/public/game/Build/
+!frontend/public/game/Build/**
