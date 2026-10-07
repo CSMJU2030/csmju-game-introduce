@@ -10,14 +10,14 @@ import {
   timingSafeEqualString,
 } from './sso-session';
 
-const { session: SESSION, state: STATE } = ssoCookieNames('csmju-demo-subsystem');
+const { session: SESSION, state: STATE } = ssoCookieNames('csmju-game-introduce');
 
 describe('SSO cookies', () => {
   describe('ssoCookieNames', () => {
     it('prefixes both cookies with the subsystem name', () => {
-      expect(ssoCookieNames('csmju-demo-subsystem')).toEqual({
-        session: 'csmju_demo_subsystem_access_token',
-        state: 'csmju_demo_subsystem_sso_state',
+      expect(ssoCookieNames('csmju-game-introduce')).toEqual({
+        session: 'csmju_game_introduce_access_token',
+        state: 'csmju_game_introduce_sso_state',
       });
     });
 

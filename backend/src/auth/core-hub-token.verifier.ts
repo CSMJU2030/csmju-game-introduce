@@ -128,7 +128,7 @@ export class CoreHubTokenVerifier {
   }
 
   private get subsystemId(): string {
-    return this.config.get<string>('subsystemId', 'csmju-demo-subsystem');
+    return this.config.get<string>('subsystemId', 'csmju-game-introduce');
   }
 
   private translate(error: unknown, kid: string): TokenVerificationError {

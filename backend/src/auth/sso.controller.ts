@@ -83,7 +83,7 @@ export class SsoController {
   }
 
   private get subsystemId(): string {
-    return this.config.get<string>('subsystemId', 'csmju-demo-subsystem');
+    return this.config.get<string>('subsystemId', 'csmju-game-introduce');
   }
 
   private get coreHubWebUrl(): string {

@@ -24,7 +24,7 @@ const CONFIG: Record<string, unknown> = {
   'coreHub.jwksMinRefreshIntervalMs': 0,
   'coreHub.jwksRequestTimeoutMs': 1_000,
   'coreHub.clockToleranceSec': 0,
-  subsystemId: 'csmju-demo-subsystem',
+  subsystemId: 'csmju-game-introduce',
 };
 
 const config = {
@@ -228,7 +228,7 @@ describe('CoreHubTokenVerifier - authentication tests (spec §13, §36)', () => 
     });
 
     it('rejects an azp that is not a string', async () => {
-      const token = await signCoreHubToken(key, { extraClaims: { azp: ['csmju-demo-subsystem'] } });
+      const token = await signCoreHubToken(key, { extraClaims: { azp: ['csmju-game-introduce'] } });
 
       await expect(verifier.verify(token)).rejects.toMatchObject({
         reason: TokenRejectionReason.INVALID_AZP,
@@ -236,10 +236,10 @@ describe('CoreHubTokenVerifier - authentication tests (spec §13, §36)', () => 
     });
 
     it('accepts a token issued for this subsystem', async () => {
-      const token = await signCoreHubToken(key, { azp: 'csmju-demo-subsystem' });
+      const token = await signCoreHubToken(key, { azp: 'csmju-game-introduce' });
 
       await expect(verifier.verify(token)).resolves.toMatchObject({
-        azp: 'csmju-demo-subsystem',
+        azp: 'csmju-game-introduce',
       });
     });
 
