@@ -25,7 +25,16 @@ docker compose ps
 
 `frontend/Dockerfile` คัดลอกทั้งไฟล์จาก template ของ standards v1.8.1 โดยไม่แก้ไข. Backend Dockerfile/entrypoint/dockerignore/compose มาจาก demo ล่าสุด. Pool DB อ่าน `DATABASE_POOL_MAX` ค่าเริ่มต้น 5. ตั้ง env ตาม `.env.example` และ `backend/.env.example`; ห้าม commit secret
 
-สถานะนี้เตรียม deployment shell และ API auth/health เท่านั้น. WebGL build ยังต้องนำเข้าจากโปรเจกต์ Unity ที่มี asset ถูกลิขสิทธิ์ก่อนเปิดให้เล่นบนโดเมนจริง
+หน้าแรกมีปุ่มเริ่มเล่นไป `/play` ซึ่งตรวจ session ผ่าน `/api/v1/me` ก่อนแสดงเกมเต็มหน้าจอ. WebGL build ที่แพ็กไว้ใน `frontend/public/game/` ถูกนำเข้า Docker image อัตโนมัติ. ปุ่มออกเกมกลับ `/portal` ซึ่งอ่าน `CORE_HUB_WEB_URL`.
+
+เมื่อต้องการอัปเดตเกม ให้ build Unity แล้วรันจากราก repository:
+
+```bash
+node scripts/package-webgl.mjs /absolute/path/to/Unity/Build/WebGL-Staging
+docker compose up -d --build --force-recreate web
+```
+
+สคริปต์เก็บเฉพาะไฟล์ที่ build ล่าสุดอ้างอิง พร้อม SHA-256 manifest และ credits; ไม่เผยแพร่ source sprite ที่มีข้อจำกัดสิทธิ์. ไฟล์เกมต้องอยู่ใน commit ก่อน GitHub สร้าง image ใหม่. หน้าเกมต้องคลิกก่อนเบราว์เซอร์อนุญาตเสียง.
 
 ชื่อทีมใน CODEOWNERS และชื่อระบบใน CI รอ DevOps เปลี่ยนตาม Issue #8; ไฟล์ protected คงตรงกับ main เพื่อผ่าน GH-03. ไม่แก้ `.github/workflows/images.yml`
 
