@@ -14,7 +14,7 @@ URL: `https://csmju-game-introduce.jowave.com`
 
 SSO callback: `https://csmju-game-introduce.jowave.com/auth/callback` (ไม่มี slash ปิดท้าย)
 
-PL ต้องลงทะเบียนและขออนุมัติระบบนี้ใน Core ก่อนทดสอบ SSO จนจบ flow. DevOps ต้องตั้ง DNS/HTTPS/reverse proxy ให้ URL นี้ชี้ service `web`. Compose ไม่เปิดพอร์ตสู่ host; web/api/db ใช้พอร์ตภายใน 3000/4000/5432 ตามมาตรฐานกลาง
+PL ต้องลงทะเบียนและขออนุมัติระบบนี้ใน Core ก่อนทดสอบ SSO จนจบ flow. DevOps ต้องตั้ง DNS/HTTPS/reverse proxy ให้ URL นี้ชี้ service `web`. พอร์ตที่จัดสรรให้ระบบคือ **5012**: เปิดในเครื่องที่ `http://localhost:5012` ทั้ง `pnpm --filter frontend dev` และ Docker Compose (`5012:3000`). web/api/db ใช้พอร์ตภายใน 3000/4000/5432 ตามมาตรฐานกลาง ส่วนโดเมนจริงยังใช้ HTTPS URL ด้านบน
 
 ```bash
 git submodule update --init standards
@@ -27,7 +27,7 @@ docker compose ps
 
 สถานะนี้เตรียม deployment shell และ API auth/health เท่านั้น. WebGL build ยังต้องนำเข้าจากโปรเจกต์ Unity ที่มี asset ถูกลิขสิทธิ์ก่อนเปิดให้เล่นบนโดเมนจริง
 
-ชื่อทีมใน CODEOWNERS และชื่อระบบใน CI เปลี่ยนเป็น game-introduce; ต้องให้ DevOps รับรองการเปลี่ยนไฟล์ protected (GH-03). ไม่แก้ `.github/workflows/images.yml`
+ชื่อทีมใน CODEOWNERS และชื่อระบบใน CI รอ DevOps เปลี่ยนตาม Issue #8; ไฟล์ protected คงตรงกับ main เพื่อผ่าน GH-03. ไม่แก้ `.github/workflows/images.yml`
 
 ## มาตรฐานกลาง
 
