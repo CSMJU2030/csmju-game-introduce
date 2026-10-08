@@ -67,6 +67,13 @@ public sealed partial class DigitalCampusGame
             player.position=new Vector3(buildingEntrance.x,buildingEntrance.y-.5f,0);
         }
         buildingInterior.SetActive(insideBuilding);
+        if(insideBuilding && students.Length>1) {
+            var patrols=new Vector2[students.Length][];
+            for(int i=0;i<students.Length;i++)patrols[i]=students[i].route;
+            for(int i=patrols.Length-1;i>0;i--) { int j=UnityEngine.Random.Range(0,i+1);var saved=patrols[i];patrols[i]=patrols[j];patrols[j]=saved; }
+            for(int i=0;i<students.Length;i++)students[i].SetPatrol(patrols[i]);
+        }
+        foreach(var student in students) if(student!=null) student.gameObject.SetActive(insideBuilding);
         Physics2D.SyncTransforms();
         foreach(var npc in npcs) if(npc!=null) npc.gameObject.SetActive(npc.npcId != "bug" && ((npc.npcId=="curriculum" || npc.npcId=="data") ? insideBuilding : !insideBuilding));
         FollowCamera(true);

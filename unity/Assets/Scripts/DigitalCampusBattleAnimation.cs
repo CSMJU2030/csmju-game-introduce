@@ -128,6 +128,12 @@ public sealed partial class DigitalCampusGame
                 Fill(new Rect(point.x - 3, point.y - 10, 6, 20), green);
             }
         }
+        if(turnAnimating && turnAction<2 && turnTime>=PlayerImpactAt && turnTime<PlayerImpactAt+.3f) {
+            float t=(turnTime-PlayerImpactAt)/.3f;
+            Color slash=new Color(.7f,1,.9f,1-t);
+            Line(bug+new Vector2(-60,-55)*t,bug+new Vector2(65,60)*t,slash,8*(1-t)+2);
+            Line(bug+new Vector2(-45,60)*t,bug+new Vector2(50,-50)*t,slash,6*(1-t)+2);
+        }
         if (bugDamage > 0) ImpactBurst(bug, turnTime - PlayerImpactAt, cyan);
         if (!battle.Won && turnTime >= 1.12f && turnTime < EnemyImpactAt)
             DrawProjectile(bug, hero, (turnTime - 1.12f) / (EnemyImpactAt - 1.12f), red);

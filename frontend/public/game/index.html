@@ -6,7 +6,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#244c35}#un
 </style></head><body><div id="unity-container"><canvas id="unity-canvas" tabindex="0"></canvas><div id="loading"><strong>CSMJU QUEST</strong><span>กำลังเข้าสู่มหาวิทยาลัย…</span><progress max="1" value="0"></progress></div><button id="fullscreen" title="เต็มหน้าจอ">⛶</button><div id="error"></div></div>
 <script>
 const canvas=document.querySelector('#unity-canvas');
-const config={dataUrl:'Build/da404941cc9541188acb39c60f693ade.data.unityweb',frameworkUrl:'Build/campus.framework.js',codeUrl:'Build/17200b68db2f7a64dc7192ebbc67a35b.wasm.unityweb',streamingAssetsUrl:'StreamingAssets',companyName:'CSMJU2030',productName:'CSMJU Quest Digital Campus Adventure',productVersion:'1.8.0',devicePixelRatio:Math.min(window.devicePixelRatio||1,1.5),matchWebGLToCanvasSize:true,fullscreenElementID:'unity-container',cacheControl:()=>'no-store'};
+const config={dataUrl:'Build/9bb6a7a87d5cdacfea01d9ecabce80c2.data.unityweb',frameworkUrl:'Build/campus.framework.js',codeUrl:'Build/3bbe5258ab94d58193fd1fe4478e61a9.wasm.unityweb',streamingAssetsUrl:'StreamingAssets',companyName:'CSMJU2030',productName:'CSMJU Quest Digital Campus Adventure',productVersion:'1.8.0',devicePixelRatio:Math.min(window.devicePixelRatio||1,1.5),matchWebGLToCanvasSize:true,fullscreenElementID:'unity-container',cacheControl:()=>'no-store'};
 function showLoadError(error){
  console.error('Campus load failed',error);
  document.querySelector('#loading').style.display='none';
@@ -17,5 +17,5 @@ function showLoadError(error){
  const retry=document.createElement('button');retry.textContent='โหลดเกมใหม่';retry.onclick=()=>{const url=new URL(location.href);url.searchParams.set('reload',Date.now());location.replace(url.href)};
  el.append(heading,message,details,retry);el.style.display='block';
 }
-const script=document.createElement('script');script.src='Build/d8625b5ce7945a9e668fe2bb283ad7d3.loader.js';script.onload=()=>createUnityInstance(canvas,config,p=>document.querySelector('progress').value=p).then(instance=>{window.campusGame=instance;document.querySelector('#loading').style.display='none';canvas.focus();document.querySelector('#fullscreen').onclick=()=>instance.SetFullscreen(1)}).catch(showLoadError);script.onerror=()=>showLoadError('ดาวน์โหลดตัวโหลดเกมไม่สำเร็จ');document.body.appendChild(script);
+const script=document.createElement('script');script.src='Build/f19b7f52db2e6c2d84c29c96bf9887dc.loader.js';script.onload=()=>createUnityInstance(canvas,config,p=>document.querySelector('progress').value=p).then(instance=>{window.campusGame=instance;document.querySelector('#loading').style.display='none';canvas.focus();document.querySelector('#fullscreen').onclick=()=>instance.SetFullscreen(1)}).catch(showLoadError);script.onerror=()=>showLoadError('ดาวน์โหลดตัวโหลดเกมไม่สำเร็จ');document.body.appendChild(script);
 </script></body></html>

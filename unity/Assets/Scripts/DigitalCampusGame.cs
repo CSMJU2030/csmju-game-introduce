@@ -56,6 +56,9 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         footstepClip = MakeTone("step", 112f, .075f, .055f);
         badgeClip = MakeTone("badge", 784f, .22f, .12f);
         InitializeBattleAudio();
+        InitializeCampusAudio();
+        menuClip=MakeTone("menu click",660f,.065f,.12f);
+        CampusOutlinedText.ClickSound=PlayUiSfx;
         foreach (var npc in npcs) if (npc != null && npc.npcId == "bug") npc.gameObject.SetActive(false);
         if (gameCamera == null) gameCamera = Camera.main;
         if (player != null && gameCamera != null) FollowCamera(true);
@@ -71,8 +74,8 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         if (state == ScreenState.Playing)
         {
             if (Input.GetKeyDown(KeyCode.M)) audioOn = !audioOn;
-            if (Input.GetKeyDown(KeyCode.Tab)) mapOpen = !mapOpen;
-            if (Input.GetKeyDown(KeyCode.I)) inventoryOpen = !inventoryOpen;
+            if (Input.GetKeyDown(KeyCode.Tab)) { mapOpen = !mapOpen; PlayUiSfx(); }
+            if (Input.GetKeyDown(KeyCode.I)) { inventoryOpen = !inventoryOpen; PlayUiSfx(); }
             if (!mapOpen && !inventoryOpen) MovePlayer(); else wasWalking = false;
             TickEncounter();
             var zone = ZoneAt(player.position);
@@ -132,13 +135,14 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private bool OnGround(Vector2 point)
     {
         if (blockedSurfaces.Any(s => s != null && s.OverlapPoint(point))) return false;
+        if (groundMask != null && groundMask.Blocks(point,mapMin,mapMax)) return false;
         if (walkableSurfaces.Length > 0) return walkableSurfaces.Any(s => s != null && s.OverlapPoint(point));
         return walkableAreas.Length == 0 || walkableAreas.Any(area => area.Contains(point));
     }
 
     private void FollowCamera(bool snap)
     {
-        if (insideBuilding) { gameCamera.orthographicSize = Mathf.Max(10.8f, 15f / Mathf.Max(.1f, gameCamera.aspect)); gameCamera.transform.position = new Vector3(interiorCameraCenter.x,interiorCameraCenter.y,-10); return; }
+        if (insideBuilding) { gameCamera.backgroundColor = new Color(.12f,.13f,.18f); gameCamera.orthographicSize = Mathf.Max(10.8f, 15f / Mathf.Max(.1f, gameCamera.aspect)); gameCamera.transform.position = new Vector3(interiorCameraCenter.x,interiorCameraCenter.y,-10); return; }
         // Fit the camera viewport inside the map at every browser aspect ratio.
         var half = (mapMax - mapMin) * .5f;
         var aspect = Mathf.Max(.1f, gameCamera.aspect);
@@ -242,7 +246,8 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private void StartGame() { encounterCountdown = UnityEngine.Random.Range(16f, 28f); state = ScreenState.Playing; Time.timeScale = 1f; if (player != null) FollowCamera(true); ShowToast("เควสต์ 1: รายงานตัวกับพี่โค้ด", 3f); }
 
     private void ShowToast(string message, float seconds) { toast = message; toastUntil = Time.unscaledTime + seconds; }
-    private void PlayUiSfx() { if (audioOn && audioSource != null && Time.unscaledTime - lastUiSfx > .05f) { audioSource.PlayOneShot(footstepClip, .65f); lastUiSfx = Time.unscaledTime; } }
+    private AudioClip menuClip;
+    private void PlayUiSfx() { if (audioOn && audioSource != null && Time.unscaledTime - lastUiSfx > .05f) { audioSource.PlayOneShot(menuClip, .65f); lastUiSfx = Time.unscaledTime; } }
 
     private void OnGUI()
     {
@@ -256,6 +261,9 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         if (state == ScreenState.Title) { DrawTitle(); CampusOutlinedText.End(); return; }
         GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1));
         if (state != ScreenState.Combat && state != ScreenState.Surprise) DrawHud();
+        DrawMiniMap();
+        GUI.matrix = Matrix4x4.identity;
+        DrawLifeOverlay();
         GUI.matrix = centered;
         if (mapOpen && state == ScreenState.Playing) DrawMap();
         if (state == ScreenState.Playing) DrawBuildingHint();
@@ -304,16 +312,11 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
 
     private void DrawMap()
     {
-        Dim(); Panel(new Rect(250, 120, 780, 480)); CampusOutlinedText.Label(new Rect(310, 150, 660, 48), "แผนที่ Digital Campus", titleStyle);
-        for (int i = 0; i < ZoneNames.Length; i++)
-        {
-            var rect = new Rect(300 + (i % 2) * 340, 230 + (i / 2) * 92, 300, 72);
-            GUI.color = ZoneColor(i); CampusOutlinedText.Picture(rect, Texture2D.whiteTexture); GUI.color = Color.white;
-            CampusOutlinedText.Label(new Rect(rect.x + 14, rect.y + 8, 274, 30), (i + 1) + ". " + ZoneNames[i], headingStyle);
-            CampusOutlinedText.Label(new Rect(rect.x + 14, rect.y + 40, 274, 27), i == activeZone ? "คุณอยู่ที่นี่" : "ก้าวสำรวจโซนนี้", smallStyle);
-        }
-        CampusOutlinedText.Label(new Rect(310, 518, 660, 42), "ห้องเรียน · ห้องบรรยาย · Computer Lab · กิจกรรม CS · Open House", smallStyle);
-        if (CampusOutlinedText.Button(new Rect(520, 548, 240, 46), "กลับไปเล่น", buttonStyle)) mapOpen = false;
+        Dim(); Panel(new Rect(250,90,780,540));
+        CampusOutlinedText.Label(new Rect(285,112,720,44),"แผนที่ Digital Campus",titleStyle);
+        if(campusMapTexture!=null && !insideBuilding) DrawCampusMap(new Rect(280,180,720,405),false);
+        else CampusOutlinedText.Label(new Rect(300,205,670,190),"ชั้น 6 อาคารแม่โจ้ 60 ปี\nห้องซ้าย: อาจารย์ Algorithm\nห้องขวา: พี่ดาต้า\nทางออกอยู่โถงด้านล่าง",bodyStyle);
+        if(CampusOutlinedText.Button(new Rect(520,584,240,36),"กลับไปเล่น",buttonStyle)) mapOpen=false;
     }
 
     private void DrawDialogue()

@@ -52,8 +52,9 @@ public static class CampusOutlinedText
         label.alignment=style.alignment==TextAnchor.MiddleCenter?TextAlignmentOptions.Center:TextAlignmentOptions.TopLeft;
         label.textWrappingMode=style.wordWrap?TextWrappingModes.Normal:TextWrappingModes.NoWrap;label.overflowMode=TextOverflowModes.Truncate;
     }
+    public static System.Action ClickSound;
     public static bool Button(Rect rect,string text,GUIStyle style){
-        var hit=GUI.Button(rect,GUIContent.none,GUIStyle.none);Box(rect,text,style);return hit;
+        var hit=GUI.Button(rect,GUIContent.none,GUIStyle.none);Box(rect,text,style);if(hit)ClickSound?.Invoke();return hit;
     }
     public static void Box(Rect rect,string text,GUIStyle style){
         var saved=GUI.color;GUI.color=saved*new Color(.3f,.55f,.45f,1);Picture(rect,Texture2D.whiteTexture);
