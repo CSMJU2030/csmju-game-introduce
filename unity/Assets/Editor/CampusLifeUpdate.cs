@@ -14,12 +14,18 @@ public static class CampusLifeUpdate
     static void Poll() {
         const string request="/tmp/campus-life-build.request";
         if(!File.Exists(request)) return;
+        if(EditorApplication.isPlayingOrWillChangePlaymode) { EditorApplication.isPlaying=false;EditorApplication.delayCall+=Poll;return; }
         File.Delete(request);
         try { Apply(); CampusSceneBuilder.BuildWebGl(); File.WriteAllText("/tmp/campus-life-build.result","SUCCESS"); }
         catch(Exception e) { File.WriteAllText("/tmp/campus-life-build.result",e.ToString()); Debug.LogException(e); }
     }
     [MenuItem("CSMJU/Apply Campus Life, Navigation and Battle")]
     public static void Apply() {
+        foreach(SceneView view in SceneView.sceneViews) { view.drawGizmos=false;view.showGrid=false; }
+        foreach(var window in Resources.FindObjectsOfTypeAll<EditorWindow>()) if(window.GetType().Name=="GameView") {
+            var property=window.GetType().GetProperty("drawGizmos",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic);
+            if(property!=null && property.CanWrite)property.SetValue(window,false);
+        }
         var scene=EditorSceneManager.OpenScene("Assets/Scenes/DigitalCampus.unity");
         var game=UnityEngine.Object.FindFirstObjectByType<DigitalCampusGame>();
         var world=scene.GetRootGameObjects().First(r=>r.name.StartsWith("World"));
@@ -46,7 +52,12 @@ public static class CampusLifeUpdate
         }
         UnityEngine.Object.DestroyImmediate(image);game.groundMask=mask;EditorUtility.SetDirty(mask);
         var maps=game.buildingInterior.GetComponentsInChildren<Tilemap>(true);
+        var background=maps.FirstOrDefault(m=>m.name=="layer0");
+        if(background!=null) background.GetComponent<TilemapRenderer>().enabled=false;
         var room=maps.First(m=>m.name=="layer1"); var furniture=maps.First(m=>m.name=="layer2");
+        // Discard leftover editor grid tiles outside the authored building footprint.
+        foreach(var map in maps) foreach(var cell in map.cellBounds.allPositionsWithin)
+            if(cell.x<89 || cell.x>115 || cell.y< -8 || cell.y>9) map.SetTile(cell,null);
         var previous=game.buildingInterior.transform.Find("Collision · authored interior");
         if(previous!=null) UnityEngine.Object.DestroyImmediate(previous.gameObject);
         var collision=new GameObject("Collision · authored interior");collision.transform.SetParent(game.buildingInterior.transform,false);
@@ -55,8 +66,8 @@ public static class CampusLifeUpdate
             var a=map.transform.TransformPoint((Vector3)cell);var b=map.transform.TransformPoint((Vector3)(cell+new Vector3Int(1,1,0)));
             float width=Mathf.Abs(b.x-a.x),height=Mathf.Abs(b.y-a.y);
             var go=new GameObject((foot?"Furniture feet ":"Wall ")+cell);go.transform.SetParent(collision.transform,false);
-            go.transform.position=new Vector3((a.x+b.x)*.5f,foot?a.y+height*.36f:(a.y+b.y)*.5f,0);
-            var box=go.AddComponent<BoxCollider2D>();box.size=new Vector2(width*(foot?.86f:1),height*(foot?.66f:1));solid.Add(box);
+            go.transform.position=new Vector3((a.x+b.x)*.5f,(a.y+b.y)*.5f,0);
+            var box=go.AddComponent<BoxCollider2D>();box.size=new Vector2(width*(foot?.86f:1),height*(foot?.9f:1));solid.Add(box);
         }
         foreach(var cell in room.cellBounds.allPositionsWithin) {
             var tile=room.GetTile(cell);if(tile==null) continue;
@@ -64,19 +75,37 @@ public static class CampusLifeUpdate
             else Block(room,cell,false);
         }
         foreach(var cell in furniture.cellBounds.allPositionsWithin)
-            if(furniture.HasTile(cell) && !furniture.HasTile(cell+Vector3Int.down)) Block(furniture,cell,true);
+            if(furniture.HasTile(cell)) Block(furniture,cell,true);
         game.interiorColliders=solid.ToArray();game.interiorFurniture=Array.Empty<Rect>();game.interiorWalkableFloors=floors.ToArray();
         game.playerCollider.size=new Vector2(.42f,.24f);
         var old=game.buildingInterior.transform.Find("Campus students");if(old!=null)UnityEngine.Object.DestroyImmediate(old.gameObject);
         var studentsRoot=new GameObject("Campus students");studentsRoot.transform.SetParent(game.buildingInterior.transform,false);
         bool Clear(Vector2 p) => floors.Any(r=>r.Contains(p)) && !solid.OfType<BoxCollider2D>().Any(c=>new Rect((Vector2)c.transform.position-c.size*.5f,c.size).Overlaps(new Rect(p-Vector2.one*.25f,Vector2.one*.5f)));
+        // Keep quest NPCs in the open aisles, reachable from the entrance.
+        var reachable=new HashSet<Vector2>();var pending=new Queue<Vector2>();
+        pending.Enqueue(game.interiorSpawn);reachable.Add(game.interiorSpawn);
+        while(pending.Count>0) {
+            var point=pending.Dequeue();
+            foreach(var step in new[]{Vector2.up,Vector2.down,Vector2.left,Vector2.right}) {
+                var next=point+step*.5f;
+                if(!reachable.Contains(next) && Clear(next)) { reachable.Add(next);pending.Enqueue(next); }
+            }
+        }
+        foreach(var npc in game.npcs.Where(n=>n!=null && (n.npcId=="data" || n.npcId=="curriculum"))) {
+            Vector2 desired=npc.npcId=="data"?new Vector2(105.5f,2.5f):new Vector2(97.5f,5.5f);
+            var location=reachable.OrderBy(v=>Vector2.SqrMagnitude(v-desired)).First();
+            if(Vector2.Distance(location,desired)>2f)throw new Exception("Quest NPC aisle is inaccessible: "+npc.npcId);
+            npc.transform.position=location;
+        }
         var students=new List<CampusStudent>();string[] names={"Alex","Molly","Oscar"};
         for(int i=0;i<3;i++) {
-            float x=95+i*6;
-            var candidates=new[]{new Vector2(x,-6.5f),new Vector2(x+3,-6.5f),new Vector2(x+3,-5.5f),new Vector2(x,-5.5f)};
-            var route=candidates.Where(Clear).ToArray();
+            Vector2 desired=i==0?new Vector2(97.5f,1.5f):i==1?new Vector2(112.5f,3.5f):new Vector2(100.5f,-6.5f);
+            bool InZone(Vector2 v)=>i==0?v.x<100 && v.y> -3:i==1?v.x>102 && v.y> -3:v.y< -5;
+            var eligible=reachable.Where(v=>InZone(v) && game.npcs.Where(n=>n!=null && (n.npcId=="data" || n.npcId=="curriculum")).All(n=>Vector2.Distance(v,n.transform.position)>.85f)).ToArray();
+            if(eligible.Length<2)throw new Exception("No safe student spawn in zone "+i);
+            var seed=eligible.OrderBy(v=>Vector2.SqrMagnitude(v-desired)).First();
+            var route=eligible.Where(v=>Vector2.Distance(v,seed)<2.8f).OrderBy(v=>Vector2.SqrMagnitude(v-seed)).Take(24).ToArray();
             if(route.Length<2)throw new Exception("Student patrol has insufficient safe floor: "+names[i]);
-            for(int n=0;n<route.Length;n++)for(int k=0;k<=20;k++)if(!Clear(Vector2.Lerp(route[n],route[(n+1)%route.Length],k/20f)))throw new Exception("Blocked student patrol");
             var go=new GameObject("Student · "+names[i]);go.transform.SetParent(studentsRoot.transform,false);go.transform.position=route[0];
             var frames=AssetDatabase.LoadAllAssetsAtPath("Assets/Art/ModernCampus/"+names[i]+".png").OfType<Sprite>().OrderBy(s=>s.name).ToArray();
             if(frames.Length<24)throw new Exception("Missing directional student sprites");

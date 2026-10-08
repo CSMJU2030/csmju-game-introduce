@@ -57,6 +57,8 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         badgeClip = MakeTone("badge", 784f, .22f, .12f);
         InitializeBattleAudio();
         InitializeCampusAudio();
+        menuClip=MakeTone("menu click",660f,.065f,.12f);
+        CampusOutlinedText.ClickSound=PlayUiSfx;
         foreach (var npc in npcs) if (npc != null && npc.npcId == "bug") npc.gameObject.SetActive(false);
         if (gameCamera == null) gameCamera = Camera.main;
         if (player != null && gameCamera != null) FollowCamera(true);
@@ -72,8 +74,8 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         if (state == ScreenState.Playing)
         {
             if (Input.GetKeyDown(KeyCode.M)) audioOn = !audioOn;
-            if (Input.GetKeyDown(KeyCode.Tab)) mapOpen = !mapOpen;
-            if (Input.GetKeyDown(KeyCode.I)) inventoryOpen = !inventoryOpen;
+            if (Input.GetKeyDown(KeyCode.Tab)) { mapOpen = !mapOpen; PlayUiSfx(); }
+            if (Input.GetKeyDown(KeyCode.I)) { inventoryOpen = !inventoryOpen; PlayUiSfx(); }
             if (!mapOpen && !inventoryOpen) MovePlayer(); else wasWalking = false;
             TickEncounter();
             var zone = ZoneAt(player.position);
@@ -140,7 +142,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
 
     private void FollowCamera(bool snap)
     {
-        if (insideBuilding) { gameCamera.orthographicSize = Mathf.Max(10.8f, 15f / Mathf.Max(.1f, gameCamera.aspect)); gameCamera.transform.position = new Vector3(interiorCameraCenter.x,interiorCameraCenter.y,-10); return; }
+        if (insideBuilding) { gameCamera.backgroundColor = new Color(.12f,.13f,.18f); gameCamera.orthographicSize = Mathf.Max(10.8f, 15f / Mathf.Max(.1f, gameCamera.aspect)); gameCamera.transform.position = new Vector3(interiorCameraCenter.x,interiorCameraCenter.y,-10); return; }
         // Fit the camera viewport inside the map at every browser aspect ratio.
         var half = (mapMax - mapMin) * .5f;
         var aspect = Mathf.Max(.1f, gameCamera.aspect);
@@ -244,7 +246,8 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private void StartGame() { encounterCountdown = UnityEngine.Random.Range(16f, 28f); state = ScreenState.Playing; Time.timeScale = 1f; if (player != null) FollowCamera(true); ShowToast("เควสต์ 1: รายงานตัวกับพี่โค้ด", 3f); }
 
     private void ShowToast(string message, float seconds) { toast = message; toastUntil = Time.unscaledTime + seconds; }
-    private void PlayUiSfx() { if (audioOn && audioSource != null && Time.unscaledTime - lastUiSfx > .05f) { audioSource.PlayOneShot(footstepClip, .65f); lastUiSfx = Time.unscaledTime; } }
+    private AudioClip menuClip;
+    private void PlayUiSfx() { if (audioOn && audioSource != null && Time.unscaledTime - lastUiSfx > .05f) { audioSource.PlayOneShot(menuClip, .65f); lastUiSfx = Time.unscaledTime; } }
 
     private void OnGUI()
     {

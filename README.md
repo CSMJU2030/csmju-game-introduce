@@ -57,7 +57,7 @@ git checkout -b feature/game-introduce/<เรื่องที่ทำ>
 
 ### Campus life and battle update
 
-The campus world is scaled to 155% with a following camera and a mini map. The existing campus artwork is retained; authored navigation polygons and a vegetation mask restrict movement to paths. Building 60 uses furniture base colliders, three distinct student patrols with ambient conversation, and nearby quest prompts. Outdoor and indoor music are separate original synthesized loops, with softened footsteps. Battle actions include impact slashes over an animated green binary backdrop.
+The campus world is scaled to 155% with a following camera and a mini map. The existing campus artwork is retained; authored navigation polygons and a vegetation mask restrict movement to paths. Building 60 uses inset furniture colliders covering all occupied furniture tiles, three distinct students with random destinations and ambient conversation, and nearby quest prompts. Student appearances are shuffled between the computer room, classroom and lobby on each entry; spawn points are reachable from the entrance. The exterior void is a solid color and Unity editing Gizmos are hidden. Buttons play a dedicated menu click sound. Outdoor and indoor music are separate original synthesized loops, with softened footsteps. Battle actions include impact slashes over an animated green binary backdrop.
 
 In Unity, `CSMJU > Apply Campus Life, Navigation and Battle` updates the authored scene. Student routes are validated against floor and furniture geometry before saving. Rebuild WebGL and run `scripts/package-webgl.mjs` to publish the updated game files.
 
