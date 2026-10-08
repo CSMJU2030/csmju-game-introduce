@@ -11,7 +11,7 @@ const paths = [...html.matchAll(/(?:dataUrl|frameworkUrl|codeUrl):\s*'([^']+)'|s
 if (paths.length !== 4 || paths.some(p => !p.startsWith("Build/") || p.includes(".."))) throw Error("Unexpected Unity entry point");
 // Read everything first; a broken build must not replace the packaged release.
 const files = paths.map(p => [p, readFileSync(join(source, p))]);
-const font = readFileSync(join(source, "TAGameboy-Regular.otf"));
+const font = readFileSync("unity/Assets/Resources/Fonts/Prompt-Regular.ttf");
 const frameworkPath = paths.find(p => p.includes(".framework.js"));
 let framework = files.find(([p]) => p === frameworkPath)[1];
 if (frameworkPath.endsWith(".unityweb")) framework = gunzipSync(framework);
@@ -22,9 +22,10 @@ rmSync(target, { recursive: true, force: true });
 mkdirSync(join(target, "Build"), { recursive: true });
 for (const [p, bytes] of files) if (p !== frameworkPath) writeFileSync(join(target, p), bytes);
 writeFileSync(join(target, "Build/campus.framework.js"), js);
-html = html.replace(frameworkPath, "Build/campus.framework.js");
+html = html.replace(frameworkPath, "Build/campus.framework.js").replaceAll("TAGameboy-Regular.otf", "Prompt-Regular.ttf").replaceAll("format('opentype')", "format('truetype')");
 writeFileSync(join(target, "index.html"), html);
-writeFileSync(join(target, "TAGameboy-Regular.otf"), font);
+writeFileSync(join(target, "Prompt-Regular.ttf"), font);
+copyFileSync("unity/Assets/Resources/Fonts/Prompt-OFL.txt", join(target, "Prompt-OFL.txt"));
 copyFileSync("unity/Assets/Docs/THIRD_PARTY_ASSETS.md", join(target, "CREDITS.md"));
 const manifest = {};
 function walk(dir) {

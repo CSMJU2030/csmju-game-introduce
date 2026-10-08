@@ -26,7 +26,7 @@ public static class CampusSceneBuilder
         Sprite SpriteAt(string prefix, int direction = 0) => walk.FirstOrDefault(s => s.name == $"{prefix}_{direction}_0");
         // TA Game Boy is the single pixel font used by every in-game label and UI style.
         // Both fields intentionally reference the same asset because the font has one weight.
-        var regular = Resources.Load<Font>("Fonts/TAGameboy-Regular");
+        var regular = Resources.Load<Font>("Fonts/Prompt-Regular");
         var semibold = regular;
 
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

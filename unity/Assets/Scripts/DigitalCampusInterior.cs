@@ -68,9 +68,9 @@ public sealed partial class DigitalCampusGame
         }
         buildingInterior.SetActive(insideBuilding);
         Physics2D.SyncTransforms();
-        foreach(var npc in npcs) if(npc!=null) npc.gameObject.SetActive(npc.npcId != "bug" && (npc.npcId=="curriculum" ? insideBuilding : !insideBuilding));
+        foreach(var npc in npcs) if(npc!=null) npc.gameObject.SetActive(npc.npcId != "bug" && ((npc.npcId=="curriculum" || npc.npcId=="data") ? insideBuilding : !insideBuilding));
         FollowCamera(true);
-        ShowToast(insideBuilding ? "พบอาจารย์ Algorithm ที่หน้าห้องบรรยายฝั่งซ้าย" : "กลับสู่หน้าคณะวิทยาศาสตร์",4);
+        ShowToast(insideBuilding ? "พบอาจารย์ Algorithm ฝั่งซ้าย และพี่ดาต้าในห้องฝั่งขวา" : "กลับสู่หน้าคณะวิทยาศาสตร์",4);
         return true;
     }
     private void DrawBuildingHint()

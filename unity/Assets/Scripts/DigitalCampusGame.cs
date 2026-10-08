@@ -47,9 +47,10 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 1f;
-        thaiRegular = Resources.Load<Font>("Fonts/TAGameboy-Regular");
+        thaiRegular = Resources.Load<Font>("Fonts/Prompt-Regular");
         thaiSemibold = thaiRegular;
         if(buildingInterior != null) buildingInterior.SetActive(false);
+        foreach(var npc in npcs) if(npc != null && (npc.npcId == "data" || npc.npcId == "curriculum")) npc.gameObject.SetActive(false);
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.loop = false;
         footstepClip = MakeTone("step", 112f, .075f, .055f);
@@ -247,9 +248,10 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     {
         EnsureStyles();
         CampusOutlinedText.Begin();
-        float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f);
+        var safe = Screen.safeArea;
+        float scale = Mathf.Min(safe.width / 1280f, safe.height / 720f);
         viewWidth = Screen.width / scale; viewHeight = Screen.height / scale;
-        var centered = Matrix4x4.TRS(new Vector3((Screen.width - 1280f * scale) * .5f, (Screen.height - 720f * scale) * .5f, 0), Quaternion.identity, new Vector3(scale, scale, 1));
+        var centered = Matrix4x4.TRS(new Vector3(safe.x + (safe.width - 1280f * scale) * .5f, Screen.height - safe.yMax + (safe.height - 720f * scale) * .5f, 0), Quaternion.identity, new Vector3(scale, scale, 1));
         GUI.matrix = centered;
         if (state == ScreenState.Title) { DrawTitle(); CampusOutlinedText.End(); return; }
         GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1));
@@ -351,7 +353,8 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         buttonStyle = new GUIStyle(GUI.skin.button) { font = thaiSemibold, fontSize = 21, alignment = TextAnchor.MiddleCenter, wordWrap = true };
     }
     private GUIStyle MakeStyle(Font font, int size, Color color) => new GUIStyle(GUI.skin.label) { font = font, fontSize = size, wordWrap = true, normal = { textColor = color } };
-    private static void Dim() { GUI.color = new Color(.015f, .035f, .025f, .78f); float scale = Mathf.Min(Screen.width / 1280f, Screen.height / 720f); float w = Screen.width / scale, h = Screen.height / scale; CampusOutlinedText.Picture(new Rect((1280f-w)*.5f, (720f-h)*.5f, w, h), Texture2D.whiteTexture); GUI.color = Color.white; }
+    private static void Dim() { GUI.color = new Color(.015f, .035f, .025f, .78f); var safe = Screen.safeArea;
+        float scale = Mathf.Min(safe.width / 1280f, safe.height / 720f); float w = Screen.width / scale, h = Screen.height / scale; CampusOutlinedText.Picture(new Rect((1280f-w)*.5f, (720f-h)*.5f, w, h), Texture2D.whiteTexture); GUI.color = Color.white; }
     private static void Panel(Rect rect) { GUI.color = new Color(.025f, .13f, .10f, .96f); CampusOutlinedText.Picture(rect, Texture2D.whiteTexture); GUI.color = Color.white; }
     private static Color ZoneColor(int zone) => zone switch { 0 => new Color(.12f,.4f,.24f), 1 => new Color(.5f,.32f,.17f), 2 => new Color(.15f,.32f,.44f), 3 => new Color(.32f,.23f,.48f), _ => new Color(.16f,.43f,.24f) };
 

@@ -17,9 +17,9 @@ public static class CampusOutlinedText
     static void EnsureCanvas(){
         if(canvas!=null)return;
         labels.Clear();images.Clear();used=imageUsed=0;
-        canvas=new GameObject("Campus UI · TA Game Boy TMP",typeof(Canvas)).GetComponent<Canvas>();
+        canvas=new GameObject("Campus UI · Prompt TMP",typeof(Canvas)).GetComponent<Canvas>();
         canvas.renderMode=RenderMode.ScreenSpaceOverlay;canvas.sortingOrder=100;
-        font=Resources.Load<TMP_FontAsset>("Fonts/TA Game Boy TMP");
+        font=Resources.Load<TMP_FontAsset>("Fonts/Prompt TMP");
     }
     static void Place(RectTransform rt,Rect rect){
         var p=GUIUtility.GUIToScreenPoint(rect.position);
@@ -50,7 +50,7 @@ public static class CampusOutlinedText
         label.text="<line-height=125%>"+text;label.fontSize=style.fontSize*scale;label.color=style.normal.textColor*GUI.color*(GUI.enabled?Color.white:new Color(1,1,1,.45f));
         label.enableAutoSizing=true;label.fontSizeMax=style.fontSize*scale;label.fontSizeMin=style.fontSize*scale*.68f;
         label.alignment=style.alignment==TextAnchor.MiddleCenter?TextAlignmentOptions.Center:TextAlignmentOptions.TopLeft;
-        label.textWrappingMode=style.wordWrap?TextWrappingModes.Normal:TextWrappingModes.NoWrap;label.overflowMode=TextOverflowModes.Overflow;
+        label.textWrappingMode=style.wordWrap?TextWrappingModes.Normal:TextWrappingModes.NoWrap;label.overflowMode=TextOverflowModes.Truncate;
     }
     public static bool Button(Rect rect,string text,GUIStyle style){
         var hit=GUI.Button(rect,GUIContent.none,GUIStyle.none);Box(rect,text,style);return hit;

@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Noto_Sans_Thai } from "next/font/google";
+import { Prompt } from "next/font/google";
 import { CsmjuAppShell, type NavItem } from "@/csmju";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
+const jakarta = Prompt({
   variable: "--font-jakarta",
-  subsets: ["latin"],
+  subsets: ["latin", "thai"],
   weight: ["400", "600", "700", "800"],
 });
 
-const notoSansThai = Noto_Sans_Thai({
+const notoSansThai = Prompt({
   variable: "--font-noto-thai",
   subsets: ["latin", "thai"],
   weight: ["400", "500", "600", "700"],
