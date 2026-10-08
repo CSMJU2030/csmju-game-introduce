@@ -87,11 +87,18 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         if (gameCamera != null && player != null) FollowCamera(false);
     }
 
+    private bool preferVertical;
     private void MovePlayer()
     {
         if (player == null) return;
         var input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        if (input.sqrMagnitude > 1f) input.Normalize();
+        if(input.x!=0 && input.y!=0) {
+            bool verticalPressed=Input.GetKeyDown(KeyCode.W)||Input.GetKeyDown(KeyCode.S)||Input.GetKeyDown(KeyCode.UpArrow)||Input.GetKeyDown(KeyCode.DownArrow);
+            bool horizontalPressed=Input.GetKeyDown(KeyCode.A)||Input.GetKeyDown(KeyCode.D)||Input.GetKeyDown(KeyCode.LeftArrow)||Input.GetKeyDown(KeyCode.RightArrow);
+            if(verticalPressed)preferVertical=true;else if(horizontalPressed)preferVertical=false;
+            if(preferVertical)input.x=0;else input.y=0;
+        }
+        if(input.sqrMagnitude>.01f)facing=input.x!=0?(input.x<0?1:2):(input.y<0?0:3);
         var walking = input.sqrMagnitude > .01f;
         var pos = (Vector2)player.position;
         var start = pos;
@@ -135,7 +142,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private bool OnGround(Vector2 point)
     {
         if (blockedSurfaces.Any(s => s != null && s.OverlapPoint(point))) return false;
-        if (groundMask != null && groundMask.Blocks(point,mapMin,mapMax)) return false;
+        if (groundMask != null) return !groundMask.Blocks(point,mapMin,mapMax);
         if (walkableSurfaces.Length > 0) return walkableSurfaces.Any(s => s != null && s.OverlapPoint(point));
         return walkableAreas.Length == 0 || walkableAreas.Any(area => area.Contains(point));
     }
