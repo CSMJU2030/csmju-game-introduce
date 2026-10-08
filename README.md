@@ -54,3 +54,11 @@ git checkout -b feature/game-introduce/<เรื่องที่ทำ>
 ```
 
 ก่อนเปิด PR อ่าน `standards/docs/github-workflow.md` ข้อ 1
+
+### Campus life and battle update
+
+The campus world is scaled to 155% with a following camera and a mini map. The existing campus artwork is retained; authored navigation polygons and a vegetation mask restrict movement to paths. Building 60 uses furniture base colliders, three distinct student patrols with ambient conversation, and nearby quest prompts. Outdoor and indoor music are separate original synthesized loops, with softened footsteps. Battle actions include impact slashes over an animated green binary backdrop.
+
+In Unity, `CSMJU > Apply Campus Life, Navigation and Battle` updates the authored scene. Student routes are validated against floor and furniture geometry before saving. Rebuild WebGL and run `scripts/package-webgl.mjs` to publish the updated game files.
+
+Validation: Unity WebGL build succeeded; all 20 standards checks passed; Chromium loaded the game and battle screen without page errors.

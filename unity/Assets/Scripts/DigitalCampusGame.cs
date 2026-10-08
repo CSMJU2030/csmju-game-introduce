@@ -56,6 +56,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         footstepClip = MakeTone("step", 112f, .075f, .055f);
         badgeClip = MakeTone("badge", 784f, .22f, .12f);
         InitializeBattleAudio();
+        InitializeCampusAudio();
         foreach (var npc in npcs) if (npc != null && npc.npcId == "bug") npc.gameObject.SetActive(false);
         if (gameCamera == null) gameCamera = Camera.main;
         if (player != null && gameCamera != null) FollowCamera(true);
@@ -132,6 +133,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private bool OnGround(Vector2 point)
     {
         if (blockedSurfaces.Any(s => s != null && s.OverlapPoint(point))) return false;
+        if (groundMask != null && groundMask.Blocks(point,mapMin,mapMax)) return false;
         if (walkableSurfaces.Length > 0) return walkableSurfaces.Any(s => s != null && s.OverlapPoint(point));
         return walkableAreas.Length == 0 || walkableAreas.Any(area => area.Contains(point));
     }
@@ -256,6 +258,9 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
         if (state == ScreenState.Title) { DrawTitle(); CampusOutlinedText.End(); return; }
         GUI.matrix = Matrix4x4.Scale(new Vector3(scale, scale, 1));
         if (state != ScreenState.Combat && state != ScreenState.Surprise) DrawHud();
+        DrawMiniMap();
+        GUI.matrix = Matrix4x4.identity;
+        DrawLifeOverlay();
         GUI.matrix = centered;
         if (mapOpen && state == ScreenState.Playing) DrawMap();
         if (state == ScreenState.Playing) DrawBuildingHint();
@@ -304,16 +309,11 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
 
     private void DrawMap()
     {
-        Dim(); Panel(new Rect(250, 120, 780, 480)); CampusOutlinedText.Label(new Rect(310, 150, 660, 48), "แผนที่ Digital Campus", titleStyle);
-        for (int i = 0; i < ZoneNames.Length; i++)
-        {
-            var rect = new Rect(300 + (i % 2) * 340, 230 + (i / 2) * 92, 300, 72);
-            GUI.color = ZoneColor(i); CampusOutlinedText.Picture(rect, Texture2D.whiteTexture); GUI.color = Color.white;
-            CampusOutlinedText.Label(new Rect(rect.x + 14, rect.y + 8, 274, 30), (i + 1) + ". " + ZoneNames[i], headingStyle);
-            CampusOutlinedText.Label(new Rect(rect.x + 14, rect.y + 40, 274, 27), i == activeZone ? "คุณอยู่ที่นี่" : "ก้าวสำรวจโซนนี้", smallStyle);
-        }
-        CampusOutlinedText.Label(new Rect(310, 518, 660, 42), "ห้องเรียน · ห้องบรรยาย · Computer Lab · กิจกรรม CS · Open House", smallStyle);
-        if (CampusOutlinedText.Button(new Rect(520, 548, 240, 46), "กลับไปเล่น", buttonStyle)) mapOpen = false;
+        Dim(); Panel(new Rect(250,90,780,540));
+        CampusOutlinedText.Label(new Rect(285,112,720,44),"แผนที่ Digital Campus",titleStyle);
+        if(campusMapTexture!=null && !insideBuilding) DrawCampusMap(new Rect(280,180,720,405),false);
+        else CampusOutlinedText.Label(new Rect(300,205,670,190),"ชั้น 6 อาคารแม่โจ้ 60 ปี\nห้องซ้าย: อาจารย์ Algorithm\nห้องขวา: พี่ดาต้า\nทางออกอยู่โถงด้านล่าง",bodyStyle);
+        if(CampusOutlinedText.Button(new Rect(520,584,240,36),"กลับไปเล่น",buttonStyle)) mapOpen=false;
     }
 
     private void DrawDialogue()

@@ -36,6 +36,7 @@ public sealed partial class DigitalCampusGame
     private void TickActivities()
     {
         SyncBattleMusic();
+        SyncCampusAudio();
         if (state == ScreenState.Combat) TickBattleTurn();
         if (state == ScreenState.Surprise) { surpriseRemaining -= Time.deltaTime; if (surpriseRemaining <= 0) state = ScreenState.Combat; }
         if (state == ScreenState.Combat) battleAnimation += Time.deltaTime;
@@ -189,10 +190,7 @@ public sealed partial class DigitalCampusGame
     private void DrawCombat()
     {
         Rect viewport=new Rect((1280-viewWidth)/2,(720-viewHeight)/2,viewWidth,viewHeight);
-        if(battleBackdrop!=null) CampusOutlinedText.Picture(viewport,battleBackdrop.texture,ScaleMode.ScaleAndCrop);
-        else Fill(viewport,new Color(.1f,.24f,.22f));
-        Fill(viewport,new Color(.025f,.07f,.105f,.73f));
-        for(int i=0;i<16;i++) Fill(new Rect(viewport.x,viewport.y+i*viewHeight/16,viewWidth,viewHeight/16+1),new Color(.02f,.12f,.13f,.08f+i*.015f));
+        DrawCodeRain(viewport);
         CampusOutlinedText.Label(new Rect(64,18,520,33),"CS CAMPUS  /  DEBUG DUEL",headingStyle);
         CampusOutlinedText.Label(new Rect(825,27,210,30),"ROUND "+(battle.Turn+1).ToString("00"),badgeStyle);
         ArenaPlatform(new Rect(740,270,435,104),new Color(.35f,.78f,.57f));

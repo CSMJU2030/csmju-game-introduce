@@ -67,6 +67,7 @@ public sealed partial class DigitalCampusGame
             player.position=new Vector3(buildingEntrance.x,buildingEntrance.y-.5f,0);
         }
         buildingInterior.SetActive(insideBuilding);
+        foreach(var student in students) if(student!=null) student.gameObject.SetActive(insideBuilding);
         Physics2D.SyncTransforms();
         foreach(var npc in npcs) if(npc!=null) npc.gameObject.SetActive(npc.npcId != "bug" && ((npc.npcId=="curriculum" || npc.npcId=="data") ? insideBuilding : !insideBuilding));
         FollowCamera(true);
