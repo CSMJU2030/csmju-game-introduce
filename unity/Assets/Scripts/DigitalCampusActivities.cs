@@ -141,14 +141,15 @@ public sealed partial class DigitalCampusGame
             GUI.enabled=true;
             int mask=showWireHint?new WirePuzzle().PortAt(i):wire.PortAt(i);
             // Tile-local rectangles avoid screen-space rotation on scaled displays.
-            GUI.BeginGroup(r);
-            Vector2 c=new Vector2(r.width/2,r.height/2); Color color=new Color(.4f,.92f,1);
-            if((mask&1)!=0) Fill(new Rect(c.x-4.5f,0,9,c.y),color);
-            if((mask&2)!=0) Fill(new Rect(c.x,c.y-4.5f,r.width-c.x,9),color);
-            if((mask&4)!=0) Fill(new Rect(c.x-4.5f,c.y,9,r.height-c.y),color);
-            if((mask&8)!=0) Fill(new Rect(0,c.y-4.5f,c.x,9),color);
+            // Render in the same absolute virtual coordinates as the tile buttons.
+            // Overlay Canvas images do not inherit IMGUI group clipping.
+            Vector2 c=r.center; Color color=new Color(.4f,.92f,1);
+            if((mask&1)!=0) Fill(new Rect(c.x-4.5f,r.y,9,r.height/2),color);
+            if((mask&2)!=0) Fill(new Rect(c.x,c.y-4.5f,r.width/2,9),color);
+            if((mask&4)!=0) Fill(new Rect(c.x-4.5f,c.y,9,r.height/2),color);
+            if((mask&8)!=0) Fill(new Rect(r.x,c.y-4.5f,r.width/2,9),color);
             if(mask!=0) Disc(new Rect(c.x-9,c.y-9,18,18),color);
-            GUI.EndGroup();
+
             CampusOutlinedText.Label(new Rect(r.x+7,r.y+5,30,24),showWireHint?((i+1)%9).ToString():wire.Cells[i]==0?"":wire.Cells[i].ToString(),smallStyle);
         }
         CampusOutlinedText.Label(new Rect(766,584,290,28),"↓ Dashboard",badgeStyle);

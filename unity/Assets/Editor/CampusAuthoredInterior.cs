@@ -76,8 +76,8 @@ public static class CampusAuthoredInterior
         game.playerBody.gravityScale=0;
         game.playerBody.constraints=RigidbodyConstraints2D.FreezeRotation;
         teacher.spriteRenderer.sortingOrder=10;
-        var font=AssetDatabase.LoadAssetAtPath<Font>("Assets/Resources/Fonts/TAGameboy-Regular.otf");game.thaiRegular=game.thaiSemibold=font;
-        const string fontPath="Assets/Resources/Fonts/TA Game Boy TMP.asset";
+        var font=AssetDatabase.LoadAssetAtPath<Font>("Assets/Resources/Fonts/Prompt-Regular.ttf");game.thaiRegular=game.thaiSemibold=font;
+        const string fontPath="Assets/Resources/Fonts/Prompt TMP.asset";
         var tmp=AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(fontPath);
         if(tmp==null){
             tmp=TMP_FontAsset.CreateFontAsset(font,48,6,UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA,1024,1024,AtlasPopulationMode.Dynamic,true);
