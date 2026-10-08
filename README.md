@@ -62,3 +62,5 @@ The campus world is scaled to 155% with a following camera and a mini map. The e
 In Unity, `CSMJU > Apply Campus Life, Navigation and Battle` updates the authored scene. Student routes are validated against floor and furniture geometry before saving. Rebuild WebGL and run `scripts/package-webgl.mjs` to publish the updated game files.
 
 Validation: Unity WebGL build succeeded; all 20 standards checks passed; Chromium loaded the game and battle screen without page errors.
+
+Campus rendering uses Order in Layer 0 for ground/paths, 1 for the player and NPCs, and 2 for foreground canopy/furniture. The illustrated campus remains one source texture; a separate masked canopy renderer selects vegetation from that texture. It is not an individually editable tree Tilemap. Quest labels render above this at order 3; UI uses order 100.

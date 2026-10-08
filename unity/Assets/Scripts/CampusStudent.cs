@@ -43,6 +43,6 @@ public sealed class CampusStudent : MonoBehaviour
             int facing=Mathf.Abs(delta.x)>Mathf.Abs(delta.y)?(delta.x<0?1:2):(delta.y<0?0:3);
             sprite.sprite=frames[facing*6+Mathf.FloorToInt(Time.time*6)%6];
         }
-        sprite.sortingOrder=10;
+        sprite.sortingOrder=1;
     }
 }

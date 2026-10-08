@@ -38,6 +38,22 @@ public static class CampusLifeUpdate
             foreach(var root in scene.GetRootGameObjects()) if(root.name.StartsWith("Navigation")) root.transform.localScale*=factor;
             for(int i=0;i<game.walkableAreas.Length;i++) { var r=game.walkableAreas[i]; game.walkableAreas[i]=new Rect(r.position*factor,r.size*factor); }
         }
+        var ground=world.GetComponent<SpriteRenderer>();ground.sortingOrder=0;
+        const string canopyMaterialPath="Assets/Art/Campus/Canopy.mat";
+        var canopyMaterial=AssetDatabase.LoadAssetAtPath<Material>(canopyMaterialPath);
+        var canopyShader=Shader.Find("Campus/Tree Canopy");
+        if(canopyShader==null)throw new Exception("Missing tree canopy shader");
+        if(canopyMaterial==null) { canopyMaterial=new Material(canopyShader);AssetDatabase.CreateAsset(canopyMaterial,canopyMaterialPath); }
+        canopyMaterial.shader=canopyShader;EditorUtility.SetDirty(canopyMaterial);
+        var canopy=world.transform.Find("Trees · foreground order 2");
+        if(canopy==null) { var go=new GameObject("Trees · foreground order 2");go.transform.SetParent(world.transform,false);canopy=go.transform; }
+        var canopyRenderer=canopy.GetComponent<SpriteRenderer>();if(canopyRenderer==null)canopyRenderer=canopy.gameObject.AddComponent<SpriteRenderer>();
+        canopyRenderer.sprite=ground.sprite;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=2;
+        game.playerRenderer.sortingOrder=1;
+        foreach(var npc in game.npcs) if(npc!=null) {
+            npc.spriteRenderer.sortingOrder=1;
+            foreach(var label in npc.GetComponentsInChildren<MeshRenderer>(true))label.sortingOrder=3;
+        }
         game.cameraViewSize=5.2f; game.campusOverview=false;
         game.campusMapTexture=world.GetComponent<SpriteRenderer>().sprite.texture;
         const string maskPath="Assets/Resources/Art/Campus Ground Mask.asset";
@@ -55,6 +71,7 @@ public static class CampusLifeUpdate
         var background=maps.FirstOrDefault(m=>m.name=="layer0");
         if(background!=null) background.GetComponent<TilemapRenderer>().enabled=false;
         var room=maps.First(m=>m.name=="layer1"); var furniture=maps.First(m=>m.name=="layer2");
+        room.GetComponent<TilemapRenderer>().sortingOrder=0;furniture.GetComponent<TilemapRenderer>().sortingOrder=2;
         // Discard leftover editor grid tiles outside the authored building footprint.
         foreach(var map in maps) foreach(var cell in map.cellBounds.allPositionsWithin)
             if(cell.x<89 || cell.x>115 || cell.y< -8 || cell.y>9) map.SetTile(cell,null);
@@ -109,7 +126,7 @@ public static class CampusLifeUpdate
             var go=new GameObject("Student · "+names[i]);go.transform.SetParent(studentsRoot.transform,false);go.transform.position=route[0];
             var frames=AssetDatabase.LoadAllAssetsAtPath("Assets/Art/ModernCampus/"+names[i]+".png").OfType<Sprite>().OrderBy(s=>s.name).ToArray();
             if(frames.Length<24)throw new Exception("Missing directional student sprites");
-            var renderer=go.AddComponent<SpriteRenderer>();renderer.sprite=frames[0];renderer.sortingOrder=10;
+            var renderer=go.AddComponent<SpriteRenderer>();renderer.sprite=frames[0];renderer.sortingOrder=1;
             var student=go.AddComponent<CampusStudent>();student.game=game;student.frames=frames;student.route=route;student.studentName=names[i];
             student.chat=new[]{"ไปทำโปรเจกต์ที่แล็บกันไหม?","วันนี้เราเรียนเขียนโปรแกรมกัน","เดี๋ยวไปถามพี่ดาต้ากันนะ"};students.Add(student);
         }
