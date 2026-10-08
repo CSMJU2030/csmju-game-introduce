@@ -3,6 +3,7 @@ using UnityEngine;
 public sealed partial class DigitalCampusGame
 {
     public GameObject buildingInterior;
+    public Vector2 interiorExit = new Vector2(114.5f,-6.5f);
     public Vector2 interiorSpawn = new Vector2(110.5f,-6.5f);
     public Vector2 interiorCameraCenter = new Vector2(102.5f,1f);
     public Collider2D[] interiorColliders = System.Array.Empty<Collider2D>();
@@ -48,7 +49,7 @@ public sealed partial class DigitalCampusGame
     }
     private bool NearBuildingPortal()
     {
-        return player != null && Vector2.Distance(player.position, insideBuilding ? interiorSpawn : buildingEntrance) < (insideBuilding ? 1.1f : 3.4f);
+        return player != null && Vector2.Distance(player.position, insideBuilding ? interiorExit : buildingEntrance) < (insideBuilding ? 1.1f : 3.4f);
     }
     private bool TryBuildingPortal()
     {
@@ -85,8 +86,8 @@ public sealed partial class DigitalCampusGame
         if(mapOpen || inventoryOpen) return;
 
         if(!NearBuildingPortal()) return;
-        Panel(insideBuilding ? new Rect(985,625,275,46) : new Rect(430,535,420,48));
-        CampusOutlinedText.Label(insideBuilding ? new Rect(999,634,251,30) : new Rect(447,544,395,32),insideBuilding ? "[E] ออกจากอาคาร" : "[E] เข้าอาคารแม่โจ้ 60 ปี",badgeStyle);
+        Panel(insideBuilding ? new Rect(viewWidth*.5f-150,viewHeight-60,300,46) : new Rect(430,535,420,48));
+        CampusOutlinedText.Label(insideBuilding ? new Rect(viewWidth*.5f-136,viewHeight-51,272,30) : new Rect(447,544,395,32),insideBuilding ? "[E] ออกจากอาคาร" : "[E] เข้าอาคารแม่โจ้ 60 ปี",badgeStyle);
     }
     private void DrawInteriorHud()
     {

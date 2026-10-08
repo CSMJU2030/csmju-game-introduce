@@ -17,6 +17,12 @@ public sealed partial class DigitalCampusGame
     }
     private void DrawLifeOverlay() {
         if(state!=ScreenState.Playing || mapOpen || inventoryOpen) return;
+        if(insideBuilding) {
+            var exit=gameCamera.WorldToScreenPoint((Vector3)interiorExit);
+            Fill(new Rect(exit.x-12,Screen.height-exit.y-4,24,5),new Color(.3f,1f,.8f));
+            Panel(new Rect(exit.x-75,Screen.height-exit.y-62,150,30));
+            CampusOutlinedText.Label(new Rect(exit.x-70,Screen.height-exit.y-59,140,25),"ทางออก [E]",badgeStyle);
+        }
         foreach(var student in students) if(student!=null && student.gameObject.activeInHierarchy && !string.IsNullOrEmpty(student.bubble)) {
             var p=gameCamera.WorldToScreenPoint(student.transform.position+Vector3.up*.9f);
             if(p.x<20 || p.x>Screen.width-20 || p.y<30 || p.y>Screen.height-100) continue;
