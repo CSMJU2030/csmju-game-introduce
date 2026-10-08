@@ -61,11 +61,78 @@ public static class CampusLifeUpdate
         if(mask==null) { mask=ScriptableObject.CreateInstance<CampusGroundMask>();AssetDatabase.CreateAsset(mask,maskPath); }
         var image=new Texture2D(2,2); image.LoadImage(File.ReadAllBytes("Assets/Art/Campus/campus-map.png"));
         mask.width=512;mask.height=288;mask.blocked=new byte[mask.width*mask.height];
+        var allowed=new bool[mask.width*mask.height];
         for(int y=0;y<mask.height;y++)for(int x=0;x<mask.width;x++) {
-            var c=image.GetPixelBilinear((x+.5f)/mask.width,(y+.5f)/mask.height);
-            // Green vegetation within the authored navigation polygons is solid.
-            mask.blocked[y*mask.width+x]=(byte)(c.g>c.r*1.03f && c.g>c.b*1.16f && c.g-c.b>.04f?1:0);
+            float u=(x+.5f)/mask.width,v=(y+.5f)/mask.height;
+            int votes=0;
+            for(int dy=-1;dy<=1;dy++)for(int dx=-1;dx<=1;dx++) {
+                var c=image.GetPixelBilinear(u+dx/(float)mask.width,v+dy/(float)mask.height);
+                bool paving=c.r>.42f && c.g>.34f && c.b>.22f && c.r>=c.g*.98f && c.g>c.b*1.04f && c.r-c.g<.28f && c.g-c.b<.30f;
+                bool steps=Mathf.Min(c.r,c.g,c.b)>.28f && Mathf.Max(c.r,c.g,c.b)-Mathf.Min(c.r,c.g,c.b)<.13f;
+                if(paving||steps)votes++;
+            }
+            float top=1-v;
+            bool building=(u>.095f&&u<.446f&&top<.342f)||(u>.595f&&u<.885f&&top<.386f);
+            allowed[y*mask.width+x]=votes>=5 && !building;
         }
+        // Keep only paving connected to the spawn, excluding isolated roof/rock pixels.
+        var connected=new bool[allowed.Length];var queue=new Queue<int>();
+        var uv=game.player.position;
+        int spawnX=Mathf.Clamp((int)(Mathf.InverseLerp(game.mapMin.x,game.mapMax.x,uv.x)*mask.width),0,mask.width-1);
+        int spawnY=Mathf.Clamp((int)(Mathf.InverseLerp(game.mapMin.y,game.mapMax.y,uv.y)*mask.height),0,mask.height-1);
+        int start=spawnY*mask.width+spawnX;
+        if(!allowed[start])throw new Exception("Player spawn is not on paving");
+        queue.Enqueue(start);connected[start]=true;
+        while(queue.Count>0) {
+            int index=queue.Dequeue(),x=index%mask.width,y=index/mask.width;
+            foreach(var step in new[]{Vector2Int.up,Vector2Int.down,Vector2Int.left,Vector2Int.right}) {
+                int nx=x+step.x,ny=y+step.y;if(nx<0||nx>=mask.width||ny<0||ny>=mask.height)continue;
+                int next=ny*mask.width+nx;if(allowed[next]&&!connected[next]) { connected[next]=true;queue.Enqueue(next); }
+            }
+        }
+        for(int i=0;i<connected.Length;i++)mask.blocked[i]=(byte)(connected[i]?0:1);
+        bool OutdoorClear(Vector2 point) {
+            foreach(var offset in new[]{Vector2.zero,new Vector2(.23f,.17f),new Vector2(-.23f,.17f),new Vector2(.23f,-.17f),new Vector2(-.23f,-.17f)})
+                if(mask.Blocks(point+offset,game.mapMin,game.mapMax))return false;
+            return true;
+        }
+        foreach(var npc in game.npcs.Where(n=>n!=null && n.npcId!="data" && n.npcId!="curriculum" && n.npcId!="bug")) {
+            if(OutdoorClear(npc.transform.position))continue;
+            var safe=new List<Vector2>();
+            for(int y=0;y<mask.height;y+=2)for(int x=0;x<mask.width;x+=2) {
+                var point=new Vector2(Mathf.Lerp(game.mapMin.x,game.mapMax.x,(x+.5f)/mask.width),Mathf.Lerp(game.mapMin.y,game.mapMax.y,(y+.5f)/mask.height));
+                if(OutdoorClear(point))safe.Add(point);
+            }
+            var location=safe.OrderBy(v=>Vector2.SqrMagnitude(v-(Vector2)npc.transform.position)).First();
+            if(Vector2.Distance(location,npc.transform.position)>5f)throw new Exception("Outdoor quest too far from paving: "+npc.npcId);
+            npc.transform.position=location;
+        }
+        if(!OutdoorClear(game.buildingEntrance))throw new Exception("Building entrance paving is obstructed");
+        // Merge blocked pixel runs vertically into editable collision rectangles.
+        var oldOutside=world.transform.Find("Background collision");if(oldOutside!=null)UnityEngine.Object.DestroyImmediate(oldOutside.gameObject);
+        var obstacles=new GameObject("Background collision");obstacles.transform.SetParent(world.transform,false);
+        var runs=new Dictionary<string,RectInt>();var rectangles=new List<RectInt>();
+        for(int y=0;y<mask.height;y++) {
+            var row=new Dictionary<string,RectInt>();
+            for(int x=0;x<mask.width;) {
+                if(connected[y*mask.width+x]) { x++;continue; }
+                int left=x;while(x<mask.width&&!connected[y*mask.width+x])x++;
+                string key=left+":"+x;
+                row[key]=runs.TryGetValue(key,out var prior)?new RectInt(left,prior.y,x-left,prior.height+1):new RectInt(left,y,x-left,1);
+            }
+            foreach(var pair in runs)if(!row.ContainsKey(pair.Key))rectangles.Add(pair.Value);
+            runs=row;
+        }
+        rectangles.AddRange(runs.Values);
+        foreach(var r in rectangles) {
+            var go=new GameObject("Obstacle "+r.x+","+r.y);go.transform.SetParent(obstacles.transform,false);
+            Vector2 min=new Vector2(Mathf.Lerp(game.mapMin.x,game.mapMax.x,r.x/(float)mask.width),Mathf.Lerp(game.mapMin.y,game.mapMax.y,r.y/(float)mask.height));
+            Vector2 max=new Vector2(Mathf.Lerp(game.mapMin.x,game.mapMax.x,r.xMax/(float)mask.width),Mathf.Lerp(game.mapMin.y,game.mapMax.y,r.yMax/(float)mask.height));
+            go.transform.position=(min+max)*.5f;
+            var box=go.AddComponent<BoxCollider2D>();box.isTrigger=true;box.size=Vector2.Scale(max-min,new Vector2(1/world.transform.lossyScale.x,1/world.transform.lossyScale.y));
+        }
+        game.walkSprites=AssetDatabase.LoadAllAssetsAtPath("Assets/Art/ModernCampus/Adam.png").OfType<Sprite>().OrderBy(sprite=>sprite.name).ToArray();
+        if(game.walkSprites.Length!=24)throw new Exception("Expected six frames for each of four directions");
         UnityEngine.Object.DestroyImmediate(image);game.groundMask=mask;EditorUtility.SetDirty(mask);
         var maps=game.buildingInterior.GetComponentsInChildren<Tilemap>(true);
         var background=maps.FirstOrDefault(m=>m.name=="layer0");
