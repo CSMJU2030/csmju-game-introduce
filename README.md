@@ -64,3 +64,5 @@ In Unity, `CSMJU > Apply Campus Life, Navigation and Battle` updates the authore
 Validation: Unity WebGL build succeeded; all 20 standards checks passed; Chromium loaded the game and battle screen without page errors.
 
 Campus rendering uses Order in Layer 0 for ground/paths, 1 for the player and NPCs, and 2 for foreground canopy/furniture. The illustrated campus remains one source texture; a separate masked canopy renderer selects vegetation from that texture. It is not an individually editable tree Tilemap. Quest labels render above this at order 3; UI uses order 100.
+
+Navigation update: the campus uses one connected paving mask with 627 merged obstacle rectangles under `World > Background collision`. Rectangles are triggers for inspection; movement uses the same mask to prevent conflicting physics responses. Existing indoor walls/furniture remain separate. The player moves in four cardinal directions; when two direction keys are held, the most recently pressed axis takes priority. Directional frames are explicitly loaded from Adam in down/left/right/up order.
