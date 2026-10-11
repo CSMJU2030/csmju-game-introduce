@@ -49,7 +49,7 @@ public static class CampusLifeUpdate
         if(canopy==null) { var go=new GameObject("Trees · foreground");go.transform.SetParent(world.transform,false);canopy=go.transform; }
         canopy.name="Trees · foreground";
         var canopyRenderer=canopy.GetComponent<SpriteRenderer>();if(canopyRenderer==null)canopyRenderer=canopy.gameObject.AddComponent<SpriteRenderer>();
-        canopyRenderer.sprite=ground.sprite;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=3;
+        canopyRenderer.sprite=ground.sprite;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=1;
         game.playerRenderer.sortingOrder=5;
         foreach(var npc in game.npcs) if(npc!=null) {
             // The legacy ring was centred at the sprite pivot (the face), not the feet.
@@ -61,6 +61,7 @@ public static class CampusLifeUpdate
         }
         game.cameraViewSize=5.2f; game.campusOverview=false;
         game.campusMapTexture=world.GetComponent<SpriteRenderer>().sprite.texture;
+        CampusStadiumBuilder.Apply(game,world.transform);
         const string maskPath="Assets/Resources/Art/Campus Ground Mask.asset";
         var mask=AssetDatabase.LoadAssetAtPath<CampusGroundMask>(maskPath);
         if(mask==null) { mask=ScriptableObject.CreateInstance<CampusGroundMask>();AssetDatabase.CreateAsset(mask,maskPath); }
@@ -78,7 +79,9 @@ public static class CampusLifeUpdate
             }
             float top=1-v;
             bool building=(u>.095f&&u<.446f&&top<.342f)||(u>.595f&&u<.885f&&top<.386f);
-            allowed[y*mask.width+x]=votes>=5 && !building;
+            var mapPoint=new Vector2(u,v);
+            allowed[y*mask.width+x]=(CampusStadiumLayout.MapUv.Contains(mapPoint) || CampusStadiumLayout.OnEntrance(mapPoint))
+                ? CampusStadiumLayout.Walkable(mapPoint) : votes>=5 && !building;
         }
         // Keep only paving connected to the spawn, excluding isolated roof/rock pixels.
         var connected=new bool[allowed.Length];var queue=new Queue<int>();
@@ -205,6 +208,7 @@ public static class CampusLifeUpdate
             student.chat=new[]{"ไปทำโปรเจกต์ที่แล็บกันไหม?","วันนี้เราเรียนเขียนโปรแกรมกัน","เดี๋ยวไปถามพี่ดาต้ากันนะ"};students.Add(student);
         }
         game.students=students.ToArray();game.buildingInterior.SetActive(false);
+        Physics2D.SyncTransforms();CampusStadiumBuilder.Validate(game);
         EditorUtility.SetDirty(game);EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);AssetDatabase.SaveAssets();
     }
 }

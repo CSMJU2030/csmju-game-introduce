@@ -12,3 +12,7 @@ Modern Interiors by LimeZu, from the user-provided Modern_Interiors_RPG_Maker_Ve
 Fantasy Battlers - Complete, user-provided archive: battler 28 (winged demon) replaces the slime. The supplied PNG is static; lunge, recoil, tint and projectile animation are provided by the game. Fungus Cave archive was inspected but is not needed for this campus update.
 
 - **Prompt** by Cadson Demak, distributed under SIL Open Font License 1.1. Used for game UI, NPC labels and the web shell. License: `Assets/Resources/Fonts/Prompt-OFL.txt`. Source: https://github.com/google/fonts/tree/main/ofl/prompt.
+
+## Sports stadium
+
+`Assets/Art/Campus/campus-stadium.png` was created with the built-in imagegen tool using the existing campus art as a style reference and the user-provided stadium photograph as an architectural reference. The photograph itself is not bundled. See `STADIUM_ART.md` for the prompt and integration notes.

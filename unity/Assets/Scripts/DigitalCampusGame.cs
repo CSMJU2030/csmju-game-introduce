@@ -15,7 +15,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
 
     private enum ScreenState { Title, Playing, Dialogue, Puzzle, Combat, Surprise, Paused, Ending }
     private static readonly string[] BadgeNames = { "Programming Badge", "Database Badge", "Web & Software Badge", "AI/Data Badge", "IoT Badge", "Teamwork Badge" };
-    private static readonly string[] ZoneNames = { "Welcome Zone", "Curriculum Hall", "Software Lab", "AI & Data Cave", "IoT Garden" };
+    private static readonly string[] ZoneNames = { "Welcome Zone", "Curriculum Hall", "Software Lab", "AI & Data Cave", "IoT Garden", "สนามกีฬา" };
     private readonly HashSet<string> badges = new HashSet<string>();
     private readonly HashSet<string> completed = new HashSet<string>();
     private ScreenState state = ScreenState.Title;
@@ -168,6 +168,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private int ZoneAt(Vector2 position)
     {
         if (insideBuilding || buildingInterior != null && Vector2.Distance(position, buildingEntrance) < 3.4f) return 1;
+        if(stadiumTexture!=null && CampusStadiumLayout.MapUv.Contains(new Vector2(Mathf.InverseLerp(mapMin.x,mapMax.x,position.x),Mathf.InverseLerp(mapMin.y,mapMax.y,position.y))))return 5;
         if (!campusOverview) return Mathf.Clamp(Mathf.FloorToInt((position.x - mapMin.x) / 14f), 0, 4);
         int closest = 0; float distance = float.MaxValue;
         for (int i = 0; i < Mathf.Min(5, npcs.Length); i++)
