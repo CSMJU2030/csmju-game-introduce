@@ -24,7 +24,7 @@ public static class CampusStadiumLayout
         Box(1190,771,20,62),Box(1367,809,23,65)
     };
     public static readonly Vector2[] Targets={Pixel(1083,705),Pixel(1350,716),Pixel(1230,614),Pixel(1320,803)};
-    public static readonly Vector2 HostUv=Pixel(1022,781);
+    public static readonly Vector2 HostUv=new Vector2(.681129f,.3266094f);
     public static bool IsSolid(Vector2 uv)
     {
         foreach(var r in Solids)if(r.Contains(uv))return true;
