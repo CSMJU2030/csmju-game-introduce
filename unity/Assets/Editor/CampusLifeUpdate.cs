@@ -48,11 +48,11 @@ public static class CampusLifeUpdate
         var canopy=world.transform.Find("Trees · foreground order 2");
         if(canopy==null) { var go=new GameObject("Trees · foreground order 2");go.transform.SetParent(world.transform,false);canopy=go.transform; }
         var canopyRenderer=canopy.GetComponent<SpriteRenderer>();if(canopyRenderer==null)canopyRenderer=canopy.gameObject.AddComponent<SpriteRenderer>();
-        canopyRenderer.sprite=ground.sprite;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=2;
-        game.playerRenderer.sortingOrder=1;
+        canopyRenderer.sprite=ground.sprite;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=3;
+        game.playerRenderer.sortingOrder=2;
         foreach(var npc in game.npcs) if(npc!=null) {
             npc.spriteRenderer.sortingOrder=1;
-            foreach(var label in npc.GetComponentsInChildren<MeshRenderer>(true))label.sortingOrder=3;
+            foreach(var label in npc.GetComponentsInChildren<MeshRenderer>(true))label.sortingOrder=4;
         }
         game.cameraViewSize=5.2f; game.campusOverview=false;
         game.campusMapTexture=world.GetComponent<SpriteRenderer>().sprite.texture;
@@ -138,7 +138,7 @@ public static class CampusLifeUpdate
         var background=maps.FirstOrDefault(m=>m.name=="layer0");
         if(background!=null) background.GetComponent<TilemapRenderer>().enabled=false;
         var room=maps.First(m=>m.name=="layer1"); var furniture=maps.First(m=>m.name=="layer2");
-        room.GetComponent<TilemapRenderer>().sortingOrder=0;furniture.GetComponent<TilemapRenderer>().sortingOrder=2;
+        room.GetComponent<TilemapRenderer>().sortingOrder=0;furniture.GetComponent<TilemapRenderer>().sortingOrder=3;
         // Discard leftover editor grid tiles outside the authored building footprint.
         foreach(var map in maps) foreach(var cell in map.cellBounds.allPositionsWithin)
             if(cell.x<89 || cell.x>115 || cell.y< -8 || cell.y>9) map.SetTile(cell,null);
@@ -175,6 +175,8 @@ public static class CampusLifeUpdate
                 if(!reachable.Contains(next) && Clear(next)) { reachable.Add(next);pending.Enqueue(next); }
             }
         }
+        game.interiorExit=reachable.OrderBy(v=>Vector2.SqrMagnitude(v-new Vector2(114.5f,-6.5f))).First();
+        if(Vector2.Distance(game.interiorExit,new Vector2(114.5f,-6.5f))>1f)throw new Exception("Exit corner is inaccessible");
         foreach(var npc in game.npcs.Where(n=>n!=null && (n.npcId=="data" || n.npcId=="curriculum"))) {
             Vector2 desired=npc.npcId=="data"?new Vector2(105.5f,2.5f):new Vector2(97.5f,5.5f);
             var location=reachable.OrderBy(v=>Vector2.SqrMagnitude(v-desired)).First();
