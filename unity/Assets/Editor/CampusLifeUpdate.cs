@@ -39,6 +39,7 @@ public static class CampusLifeUpdate
             for(int i=0;i<game.walkableAreas.Length;i++) { var r=game.walkableAreas[i]; game.walkableAreas[i]=new Rect(r.position*factor,r.size*factor); }
         }
         var ground=world.GetComponent<SpriteRenderer>();ground.sortingOrder=0;
+        CampusStadiumBuilder.LoadMap(game,ground);
         const string canopyMaterialPath="Assets/Art/Campus/Canopy.mat";
         var canopyMaterial=AssetDatabase.LoadAssetAtPath<Material>(canopyMaterialPath);
         var canopyShader=Shader.Find("Campus/Tree Canopy");
@@ -49,7 +50,7 @@ public static class CampusLifeUpdate
         if(canopy==null) { var go=new GameObject("Trees · foreground");go.transform.SetParent(world.transform,false);canopy=go.transform; }
         canopy.name="Trees · foreground";
         var canopyRenderer=canopy.GetComponent<SpriteRenderer>();if(canopyRenderer==null)canopyRenderer=canopy.gameObject.AddComponent<SpriteRenderer>();
-        canopyRenderer.sprite=ground.sprite;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=1;
+        canopyRenderer.sprite=ground.sprite;canopyRenderer.drawMode=ground.drawMode;canopyRenderer.size=ground.size;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=1;
         game.playerRenderer.sortingOrder=5;
         foreach(var npc in game.npcs) if(npc!=null) {
             // The legacy ring was centred at the sprite pivot (the face), not the feet.
@@ -65,7 +66,7 @@ public static class CampusLifeUpdate
         const string maskPath="Assets/Resources/Art/Campus Ground Mask.asset";
         var mask=AssetDatabase.LoadAssetAtPath<CampusGroundMask>(maskPath);
         if(mask==null) { mask=ScriptableObject.CreateInstance<CampusGroundMask>();AssetDatabase.CreateAsset(mask,maskPath); }
-        var image=new Texture2D(2,2); image.LoadImage(File.ReadAllBytes("Assets/Art/Campus/campus-map.png"));
+        var image=new Texture2D(2,2); image.LoadImage(File.ReadAllBytes(CampusStadiumBuilder.MapPath));
         mask.width=512;mask.height=288;mask.blocked=new byte[mask.width*mask.height];
         var allowed=new bool[mask.width*mask.height];
         for(int y=0;y<mask.height;y++)for(int x=0;x<mask.width;x++) {
@@ -80,8 +81,8 @@ public static class CampusLifeUpdate
             float top=1-v;
             bool building=(u>.095f&&u<.446f&&top<.342f)||(u>.595f&&u<.885f&&top<.386f);
             var mapPoint=new Vector2(u,v);
-            allowed[y*mask.width+x]=(CampusStadiumLayout.MapUv.Contains(mapPoint) || CampusStadiumLayout.OnEntrance(mapPoint))
-                ? CampusStadiumLayout.Walkable(mapPoint) : votes>=5 && !building;
+            allowed[y*mask.width+x]=!CampusStadiumLayout.IsSolid(mapPoint)
+                && (CampusStadiumLayout.OnTrack(mapPoint) || votes>=5 && !building);
         }
         // Keep only paving connected to the spawn, excluding isolated roof/rock pixels.
         var connected=new bool[allowed.Length];var queue=new Queue<int>();

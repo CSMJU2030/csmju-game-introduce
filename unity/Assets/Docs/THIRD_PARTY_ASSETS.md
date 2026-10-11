@@ -15,4 +15,4 @@ Fantasy Battlers - Complete, user-provided archive: battler 28 (winged demon) re
 
 ## Sports stadium
 
-`Assets/Art/Campus/campus-stadium.png` was created with the built-in imagegen tool using the existing campus art as a style reference and the user-provided stadium photograph as an architectural reference. The photograph itself is not bundled. See `STADIUM_ART.md` for the prompt and integration notes.
+`Assets/Art/Campus/campus-map-stadium.png` was edited with the built-in imagegen tool using the complete original campus map as the edit target and the user-provided stadium photograph as an architectural reference. The photograph itself is not bundled. See `STADIUM_ART.md` for the prompt and integration notes.

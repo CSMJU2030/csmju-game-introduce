@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0bcfc6281921348ee9cc9b4a30449bd2
+guid: 195523a37ff09447b9a140ed60ef1d83
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7143334501987038920
-    second: campus-stadium_0
+      213: -3775769974929704698
+    second: campus-map-stadium_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -48,10 +48,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 41.8
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -115,13 +115,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: campus-stadium_0
+      name: campus-map-stadium_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1374
-        height: 1145
+        width: 1672
+        height: 941
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,8 +130,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 83945411e17cddc90800000000000000
-      internalID: -7143334501987038920
+      spriteID: 609bab27635c99bc0800000000000000
+      internalID: -3775769974929704698
       vertices: []
       indices:
       edges: []

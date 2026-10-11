@@ -7,59 +7,47 @@ using UnityEngine;
 
 public static class CampusStadiumBuilder
 {
+    public const string MapPath="Assets/Art/Campus/campus-map-stadium.png";
+    public static void LoadMap(DigitalCampusGame game,SpriteRenderer ground)
+    {
+        var importer=(TextureImporter)AssetImporter.GetAtPath(MapPath);
+        if(importer==null)throw new Exception("Edited campus map is missing");
+        var texture=AssetDatabase.LoadAssetAtPath<Texture2D>(MapPath);
+        importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;
+        importer.spritePixelsPerUnit=texture.width/40f;
+        var settings=new TextureImporterSettings();importer.ReadTextureSettings(settings);
+        settings.spriteMeshType=SpriteMeshType.FullRect;importer.SetTextureSettings(settings);
+        importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;
+        importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();
+        ground.sprite=AssetDatabase.LoadAssetAtPath<Sprite>(MapPath);
+        ground.drawMode=SpriteDrawMode.Sliced;
+        ground.size=(game.mapMax-game.mapMin)/ground.transform.lossyScale.x;
+        game.campusMapTexture=ground.sprite.texture;
+    }
     public static void Apply(DigitalCampusGame game,Transform world)
     {
-        const string path="Assets/Art/Campus/campus-stadium.png";
-        var importer=(TextureImporter)AssetImporter.GetAtPath(path);
-        if(importer==null)throw new Exception("Stadium art is missing");
-        importer.textureType=TextureImporterType.Sprite;importer.spriteImportMode=SpriteImportMode.Single;
-        importer.spritePixelsPerUnit=64;importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;
-        importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();
-        var sprite=AssetDatabase.LoadAssetAtPath<Sprite>(path);
-        game.stadiumTexture=sprite.texture;
+        // Retire the old patch and connector sprites. The stadium now belongs
+        // to the complete campus texture, shared by the world and mini map.
         foreach(var name in new[]{"Sports stadium","Stadium entrance · open walkway","Stadium solids · stands goals lights planters"}) {
             var old=world.Find(name);if(old!=null)UnityEngine.Object.DestroyImmediate(old.gameObject);
         }
-        var root=new GameObject("Sports stadium");root.transform.SetParent(world,false);
-        Vector2 At(Vector2 uv)=>game.mapMin+Vector2.Scale(uv,game.mapMax-game.mapMin);
-        var uvRect=CampusStadiumLayout.MapUv;var size=Vector2.Scale(uvRect.size,game.mapMax-game.mapMin);
-        root.transform.position=At(uvRect.center);
-        var renderer=root.AddComponent<SpriteRenderer>();renderer.sprite=sprite;renderer.sortingOrder=2;
-        root.transform.localScale=new Vector3(size.x/sprite.bounds.size.x/world.lossyScale.x,size.y/sprite.bounds.size.y/world.lossyScale.y,1);
-        // Match the existing paving at the west gate, linking to the diagonal path.
-        var bridge=new GameObject("Stadium entrance · open walkway");bridge.transform.SetParent(world,false);
-        var paving=Sprite.Create(game.campusMapTexture,new Rect(820,195,24,24),new Vector2(.5f,.5f),24);
-        // Persist a reference sprite so the scene is editable after reopening Unity.
-        const string pavingPath="Assets/Art/Campus/Stadium entrance paving.asset";
-        var saved=AssetDatabase.LoadAssetAtPath<Sprite>(pavingPath);
-        if(saved==null){AssetDatabase.CreateAsset(paving,pavingPath);saved=paving;}else UnityEngine.Object.DestroyImmediate(paving);
-        for(int i=1;i<CampusStadiumLayout.EntranceRoute.Length;i++) {
-            var a=At(CampusStadiumLayout.EntranceRoute[i-1]);var b=At(CampusStadiumLayout.EntranceRoute[i]);var d=b-a;
-            var segment=new GameObject("Paved connection "+i);segment.transform.SetParent(bridge.transform,false);segment.transform.position=(a+b)*.5f;
-            segment.transform.rotation=Quaternion.Euler(0,0,Mathf.Atan2(d.y,d.x)*Mathf.Rad2Deg);
-            var road=segment.AddComponent<SpriteRenderer>();road.sprite=saved;road.sortingOrder=3;road.drawMode=SpriteDrawMode.Tiled;
-            road.size=new Vector2(d.magnitude+.8f,(game.mapMax.x-game.mapMin.x)*.026f)/world.lossyScale.x;
-        }
-        var gate=CampusStadiumLayout.EntranceUv;var gatePiece=new GameObject("West gate paving");gatePiece.transform.SetParent(bridge.transform,false);gatePiece.transform.position=At(gate.center);
-        var sr=gatePiece.AddComponent<SpriteRenderer>();sr.sprite=saved;sr.sortingOrder=3;sr.drawMode=SpriteDrawMode.Tiled;
-        sr.size=Vector2.Scale(gate.size,game.mapMax-game.mapMin)/world.lossyScale.x;
         // Remove the former plaza flowerbed: there is now grass at that position.
         foreach(var blocked in game.blockedSurfaces)if(blocked!=null)UnityEngine.Object.DestroyImmediate(blocked.gameObject);
         game.blockedSurfaces=Array.Empty<PolygonCollider2D>();
         var blockers=new GameObject("Stadium solids · stands goals lights planters");blockers.transform.SetParent(world,false);
         for(int i=0;i<CampusStadiumLayout.Solids.Length;i++) {
-            var r=CampusStadiumLayout.Solids[i];var go=new GameObject(i==0?"Grandstand":i<3?"Goal frame "+i:i<7?"Floodlight base "+i:"Planter "+i);
+            var r=CampusStadiumLayout.Solids[i];var go=new GameObject(i==0?"Grandstand":i<3?"Goal frame "+i:"Lamp base "+i);
             go.transform.SetParent(blockers.transform,false);go.transform.position=CampusStadiumLayout.At(r.center,game.mapMin,game.mapMax);
             var collider=go.AddComponent<BoxCollider2D>();collider.isTrigger=true;
-            collider.size=Vector2.Scale(Vector2.Scale(r.size,uvRect.size),game.mapMax-game.mapMin)/world.lossyScale.x;
+            collider.size=Vector2.Scale(r.size,game.mapMax-game.mapMin)/world.lossyScale.x;
         }
-        var host=game.npcs.First(n=>n.npcId=="openhouse");host.transform.position=CampusStadiumLayout.At(new Vector2(.083f,.60f),game.mapMin,game.mapMax);
+        var host=game.npcs.First(n=>n.npcId=="openhouse");host.transform.position=CampusStadiumLayout.At(CampusStadiumLayout.HostUv,game.mapMin,game.mapMax);
     }
     public static void Validate(DigitalCampusGame game)
     {
         var method=typeof(DigitalCampusGame).GetMethod("CanWalk",BindingFlags.NonPublic|BindingFlags.Instance);
         bool Can(Vector2 p)=>(bool)method.Invoke(game,new object[]{p});
-        var targets=new[]{new Vector2(.083f,.60f),new Vector2(.54f,.43f),new Vector2(.54f,.68f),new Vector2(.54f,.18f)};
+        var targets=CampusStadiumLayout.Targets;
         foreach(var p in targets)if(!Can(CampusStadiumLayout.At(p,game.mapMin,game.mapMax)))throw new Exception("Stadium playable floor is blocked: "+p);
         foreach(var r in CampusStadiumLayout.Solids)if(Can(CampusStadiumLayout.At(r.center,game.mapMin,game.mapMax)))throw new Exception("Stadium obstacle is walkable: "+r);
         // Check reachability with the full hero footprint, including the west gate.
@@ -82,6 +70,6 @@ public static class CampusStadiumBuilder
         foreach(var cell in route){var d=cell-previous;if(d!=direction && count>0){segments.Add("["+direction.x+","+direction.y+","+(count*step).ToString(System.Globalization.CultureInfo.InvariantCulture)+"]");count=0;}direction=d;count++;previous=cell;}
         if(count>0)segments.Add("["+direction.x+","+direction.y+","+(count*step).ToString(System.Globalization.CultureInfo.InvariantCulture)+"]");
         System.IO.File.WriteAllText("/tmp/campus-stadium-route.json","["+string.Join(",",segments)+"]");
-        Debug.Log("STADIUM VALIDATION PASSED: west entrance, football field and both track straights reachable; stands/goals/lights blocked.");
+        Debug.Log("STADIUM VALIDATION PASSED: entrance, football field and both track straights reachable; stands/goals/lights blocked.");
     }
 }

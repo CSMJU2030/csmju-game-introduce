@@ -6,7 +6,6 @@ public sealed partial class DigitalCampusGame
     public CampusStudent[] students=System.Array.Empty<CampusStudent>();
     public CampusGroundMask groundMask;
     public Texture2D campusMapTexture;
-    public Texture2D stadiumTexture;
     public bool AmbientMoving => insideBuilding && state==ScreenState.Playing && !mapOpen && !inventoryOpen;
     public bool AmbientCanWalk(Vector2 p) {
         foreach(var d in new[]{Vector2.zero,new Vector2(.18f,.18f),new Vector2(-.18f,-.18f),new Vector2(-.18f,.18f),new Vector2(.18f,-.18f)}) {
@@ -47,18 +46,6 @@ public sealed partial class DigitalCampusGame
     }
     private void DrawCampusMap(Rect r,bool cameraFrame) {
         CampusOutlinedText.Picture(r,campusMapTexture);
-        if(stadiumTexture!=null) {
-            var uv=CampusStadiumLayout.MapUv;
-            CampusOutlinedText.Picture(new Rect(r.x+uv.x*r.width,r.y+(1-uv.yMax)*r.height,uv.width*r.width,uv.height*r.height),stadiumTexture);
-            for(int i=1;i<CampusStadiumLayout.EntranceRoute.Length;i++) {
-                var a=CampusStadiumLayout.EntranceRoute[i-1];var b=CampusStadiumLayout.EntranceRoute[i];
-                int steps=Mathf.CeilToInt(Vector2.Distance(Vector2.Scale(a,r.size),Vector2.Scale(b,r.size)));
-                for(int j=0;j<=steps;j++) { var point=Vector2.Lerp(a,b,j/(float)Mathf.Max(1,steps));
-                    Fill(new Rect(r.x+point.x*r.width-2, r.y+(1-point.y)*r.height-2,4,4),new Color(.93f,.73f,.45f)); }
-            }
-            var entrance=CampusStadiumLayout.EntranceUv;
-            Fill(new Rect(r.x+entrance.x*r.width,r.y+(1-entrance.yMax)*r.height,entrance.width*r.width,entrance.height*r.height),new Color(.93f,.73f,.45f));
-        }
         Vector2 At(Vector2 world)=>new Vector2(r.x+Mathf.InverseLerp(mapMin.x,mapMax.x,world.x)*r.width,r.y+(1-Mathf.InverseLerp(mapMin.y,mapMax.y,world.y))*r.height);
         foreach(var npc in npcs) if(npc!=null && npc.gameObject.activeInHierarchy && npc.npcId!="bug") {
             var p=At(npc.transform.position); Fill(new Rect(p.x-3,p.y-3,6,6),new Color(1,.8f,.2f));

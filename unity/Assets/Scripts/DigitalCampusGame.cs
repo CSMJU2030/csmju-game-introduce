@@ -168,7 +168,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private int ZoneAt(Vector2 position)
     {
         if (insideBuilding || buildingInterior != null && Vector2.Distance(position, buildingEntrance) < 3.4f) return 1;
-        if(stadiumTexture!=null && CampusStadiumLayout.MapUv.Contains(new Vector2(Mathf.InverseLerp(mapMin.x,mapMax.x,position.x),Mathf.InverseLerp(mapMin.y,mapMax.y,position.y))))return 5;
+        if(CampusStadiumLayout.MapUv.Contains(new Vector2(Mathf.InverseLerp(mapMin.x,mapMax.x,position.x),Mathf.InverseLerp(mapMin.y,mapMax.y,position.y))))return 5;
         if (!campusOverview) return Mathf.Clamp(Mathf.FloorToInt((position.x - mapMin.x) / 14f), 0, 4);
         int closest = 0; float distance = float.MaxValue;
         for (int i = 0; i < Mathf.Min(5, npcs.Length); i++)
