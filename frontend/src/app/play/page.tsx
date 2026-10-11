@@ -21,5 +21,5 @@ export default async function PlayPage() {
   if (!response.ok) {
     return <section className={`${cardClass} space-y-4 p-6`}><h1 className="text-headline-md">ยังเปิดเกมไม่ได้</h1><p>กรุณากลับหน้าหลักแล้วลองอีกครั้ง</p><Link className={primaryButtonClass} href="/">กลับหน้าหลัก</Link></section>;
   }
-  return <iframe title="CSMJU Quest: Digital Campus Adventure" src="/game/index.html" className="fixed inset-0 z-50 h-dvh w-full border-0 bg-background" allow="fullscreen; autoplay" allowFullScreen />;
+  return <iframe title="CSMJU Introduce: Digital Campus Adventure" src="/game/index.html" className="fixed inset-0 z-50 h-dvh w-full border-0 bg-background" allow="fullscreen; autoplay" allowFullScreen />;
 }

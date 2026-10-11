@@ -61,7 +61,7 @@ services:
       CORE_HUB_ISSUER: ${CORE_HUB_ISSUER:-core-hub}
       CORE_HUB_AUDIENCE: ${CORE_HUB_AUDIENCE:-csmju2030}
       SUBSYSTEM_ID: ${SUBSYSTEM_ID:-csmju-game-introduce}
-      SUBSYSTEM_NAME: '${SUBSYSTEM_NAME:-CSMJU Quest: Digital Campus Adventure}'
+      SUBSYSTEM_NAME: '${SUBSYSTEM_NAME:-CSMJU Introduce: Digital Campus Adventure}'
       TZ: Asia/Bangkok
     tmpfs:
       - /tmp:size=32m

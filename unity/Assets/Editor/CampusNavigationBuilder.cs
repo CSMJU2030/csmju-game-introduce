@@ -44,9 +44,6 @@ public static class CampusNavigationBuilder
         game.coreHomeUrl = "http://127.0.0.1:3100/";
         game.player.position = At(.5f,.675f); game.player.localScale = Vector3.one*2.8f;
         var positions = new[] { new Vector2(.50f,.555f), new Vector2(.27f,.49f), new Vector2(.734f,.526f), new Vector2(.381f,.55f), new Vector2(.87f,.567f), new Vector2(.747f,.843f) };
-        const string matPath = "Assets/Art/Campus/NpcMarker.mat";
-        var material = AssetDatabase.LoadAssetAtPath<Material>(matPath);
-        if(material == null) { material=new Material(Shader.Find("Sprites/Default")); AssetDatabase.CreateAsset(material,matPath); }
         for(int i=0;i<game.npcs.Length;i++)
         {
             var npc=game.npcs[i]; npc.transform.position=At(positions[i].x,positions[i].y); npc.transform.localScale=Vector3.one*3;
@@ -58,11 +55,7 @@ public static class CampusNavigationBuilder
             var shadow=UnityEngine.Object.Instantiate(label.gameObject,npc.transform);shadow.name="LabelShadow";
             shadow.transform.localPosition=label.transform.localPosition+new Vector3(.011f,-.011f,0);
             shadow.GetComponent<TextMeshPro>().color=new Color(.07f,.12f,.09f);shadow.GetComponent<MeshRenderer>().sortingOrder=22;
-            var marker=new GameObject("Marker · interaction ring");marker.transform.SetParent(npc.transform,false);
-            var line=marker.AddComponent<LineRenderer>();line.sharedMaterial=material;line.useWorldSpace=false;line.loop=true;line.positionCount=40;
-            line.startWidth=line.endWidth=.025f;line.sortingOrder=3;
-            line.startColor=line.endColor=i==5?new Color(1f,.83f,.2f):new Color(.2f,1f,.9f);
-            for(int n=0;n<40;n++){float a=n*Mathf.PI*2/40;line.SetPosition(n,new Vector3(Mathf.Cos(a)*.22f,Mathf.Sin(a)*.085f,0));}
+
         }
         Physics2D.SyncTransforms();
         Validate(game);

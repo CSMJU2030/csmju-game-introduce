@@ -47,6 +47,18 @@ public sealed partial class DigitalCampusGame
         }
         return true;
     }
+    // The outdoor canopy is a colour mask of the whole map. Keep actors above
+    // it so foliage cannot erase their heads while their feet are on paving.
+    // Indoors, furniture remains above actors and collision protects its footprint.
+    private void UpdateActorLayers()
+    {
+        if(playerRenderer != null) playerRenderer.sortingOrder=insideBuilding?2:5;
+        foreach(var npc in npcs) if(npc != null) {
+            if(npc.spriteRenderer != null) npc.spriteRenderer.sortingOrder=insideBuilding?1:4;
+            foreach(var label in npc.GetComponentsInChildren<MeshRenderer>(true))
+                label.sortingOrder=insideBuilding?4:6;
+        }
+    }
     private bool NearBuildingPortal()
     {
         return player != null && Vector2.Distance(player.position, insideBuilding ? interiorExit : buildingEntrance) < (insideBuilding ? 1.1f : 3.4f);
@@ -68,6 +80,7 @@ public sealed partial class DigitalCampusGame
             player.position=new Vector3(buildingEntrance.x,buildingEntrance.y-.5f,0);
         }
         buildingInterior.SetActive(insideBuilding);
+        UpdateActorLayers();
         if(insideBuilding && students.Length>1) {
             var patrols=new Vector2[students.Length][];
             for(int i=0;i<students.Length;i++)patrols[i]=students[i].route;

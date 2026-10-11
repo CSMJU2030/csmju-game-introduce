@@ -26,6 +26,6 @@ public_endpoints:
 owners:
   pl: "@csmju2030/pl-game-introduce"
   aie: "@csmju2030/aie-game-introduce"
-display_name: 'CSMJU Quest: Digital Campus Adventure'
+display_name: 'CSMJU Introduce: Digital Campus Adventure'
 repo: github.com/CSMJU2030/csmju-game-introduce
 status: proposed

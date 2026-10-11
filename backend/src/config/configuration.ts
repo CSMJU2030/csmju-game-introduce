@@ -37,7 +37,7 @@ export default (): AppConfig => {
     nodeEnv: process.env.NODE_ENV ?? 'development',
     port: num(process.env.PORT, 4203),
     subsystemId: process.env.SUBSYSTEM_ID ?? 'csmju-game-introduce',
-    subsystemName: process.env.SUBSYSTEM_NAME ?? 'CSMJU Quest: Digital Campus Adventure',
+    subsystemName: process.env.SUBSYSTEM_NAME ?? 'CSMJU Introduce: Digital Campus Adventure',
     coreHub: {
       url: coreHubUrl,
       // On the real server the web app and the API share one origin.

@@ -16,7 +16,7 @@ const notoSansThai = Prompt({
 });
 
 // TODO: เปลี่ยนเป็นชื่อระบบย่อยของคุณ (ต้องตรงกับ display_name ใน subsystem.yaml)
-const DISPLAY_NAME = "CSMJU Quest";
+const DISPLAY_NAME = "CSMJU Introduce";
 
 // TODO: เมนูของระบบย่อย — icon เลือกได้จาก NavIconName ใน src/csmju/CsmjuAppShell.tsx
 const NAV: NavItem[] = [

@@ -169,7 +169,7 @@ public static class CampusSceneBuilder
         PlayerSettings.bundleVersion = "1.8.0";
         PlayerSettings.WebGL.nameFilesAsHashes = true;
         PlayerSettings.WebGL.debugSymbolMode = WebGLDebugSymbolMode.Embedded;
-        PlayerSettings.companyName = "CSMJU2030"; PlayerSettings.productName = "CSMJU Quest Digital Campus Adventure";
+        PlayerSettings.companyName = "CSMJU2030"; PlayerSettings.productName = "CSMJU Introduce Digital Campus Adventure";
         const string staging = "Build/WebGL-Staging";
         if (Directory.Exists(staging)) Directory.Delete(staging, true);
         var options = new BuildPlayerOptions { scenes = new[] { ScenePath }, locationPathName = staging, target = BuildTarget.WebGL, options = BuildOptions.None };

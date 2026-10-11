@@ -45,14 +45,19 @@ public static class CampusLifeUpdate
         if(canopyShader==null)throw new Exception("Missing tree canopy shader");
         if(canopyMaterial==null) { canopyMaterial=new Material(canopyShader);AssetDatabase.CreateAsset(canopyMaterial,canopyMaterialPath); }
         canopyMaterial.shader=canopyShader;EditorUtility.SetDirty(canopyMaterial);
-        var canopy=world.transform.Find("Trees · foreground order 2");
-        if(canopy==null) { var go=new GameObject("Trees · foreground order 2");go.transform.SetParent(world.transform,false);canopy=go.transform; }
+        var canopy=world.transform.Find("Trees · foreground") ?? world.transform.Find("Trees · foreground order 2");
+        if(canopy==null) { var go=new GameObject("Trees · foreground");go.transform.SetParent(world.transform,false);canopy=go.transform; }
+        canopy.name="Trees · foreground";
         var canopyRenderer=canopy.GetComponent<SpriteRenderer>();if(canopyRenderer==null)canopyRenderer=canopy.gameObject.AddComponent<SpriteRenderer>();
         canopyRenderer.sprite=ground.sprite;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=3;
-        game.playerRenderer.sortingOrder=2;
+        game.playerRenderer.sortingOrder=5;
         foreach(var npc in game.npcs) if(npc!=null) {
-            npc.spriteRenderer.sortingOrder=1;
-            foreach(var label in npc.GetComponentsInChildren<MeshRenderer>(true))label.sortingOrder=4;
+            // The legacy ring was centred at the sprite pivot (the face), not the feet.
+            // The nearby E prompt already identifies interactable NPCs.
+            foreach(var child in npc.transform.Cast<Transform>().ToArray())
+                if(child.name.StartsWith("Marker")) UnityEngine.Object.DestroyImmediate(child.gameObject);
+            npc.spriteRenderer.sortingOrder=4;
+            foreach(var label in npc.GetComponentsInChildren<MeshRenderer>(true))label.sortingOrder=6;
         }
         game.cameraViewSize=5.2f; game.campusOverview=false;
         game.campusMapTexture=world.GetComponent<SpriteRenderer>().sprite.texture;
