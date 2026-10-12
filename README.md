@@ -1,6 +1,6 @@
 # csmju-game-introduce
 
-CSMJU Quest: Digital Campus Adventure — เกม Unity 2D RPG แนะนำสาขาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยแม่โจ้
+CSMJU Introduce: Digital Campus Adventure — เกม Unity 2D RPG แนะนำสาขาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยแม่โจ้
 
 โปรเจกต์เกมอยู่ใน `unity/` นำ asset ที่มีสิทธิ์ใช้งานกลับเข้าตาม [Asset setup](unity/ASSET_SETUP.md) ก่อน จากนั้นเปิดโฟลเดอร์นี้ผ่าน Unity Hub ด้วย Unity 6000.6.4f1 แล้วเปิด `Assets/Scenes/DigitalCampus.unity`.
 
@@ -40,7 +40,7 @@ docker compose up -d --build --force-recreate web
 
 ## มาตรฐานกลาง
 
-CSMJU Quest: Digital Campus Adventure — ระบบย่อยของโครงการ CSMJU2030
+CSMJU Introduce: Digital Campus Adventure — ระบบย่อยของโครงการ CSMJU2030
 
 มาตรฐานกลางอยู่ใน `standards/` (submodule ของ CSMJU2030/csmju2030-standards)
 เลือก standards v1.8.1 ทั้ง `.standards-version` และ submodule tag `v1.8.1`
@@ -63,8 +63,10 @@ In Unity, `CSMJU > Apply Campus Life, Navigation and Battle` updates the authore
 
 Validation: Unity WebGL build succeeded; all 20 standards checks passed; Chromium loaded the game and battle screen without page errors.
 
-Campus rendering uses Order in Layer 0 for ground/paths, 1 for NPCs, 2 for the player, and 3 for foreground canopy/furniture. The illustrated campus remains one source texture; a separate masked canopy renderer selects vegetation from that texture. It is not an individually editable tree Tilemap. Quest labels render above this at order 4; UI uses order 100.
+Outdoor rendering uses Order in Layer 0 for ground/paths, 1 for canopy, 4 for NPCs and 5 for the player, so the colour-masked vegetation cannot hide characters standing on paving. Indoors the orders remain 0 for floors, 1 for NPCs, 2 for the player and 3 for furniture. The illustrated campus remains one source texture; a separate masked canopy renderer selects vegetation from that texture. It is not an individually editable tree Tilemap. Quest labels use order 6 outdoors and 4 indoors; UI uses order 100. Legacy NPC interaction rings have been removed; nearby E prompts identify quest interactions.
 
-Navigation update: the campus uses one connected paving mask with 627 merged obstacle rectangles under `World > Background collision`. Rectangles are triggers for inspection; movement uses the same mask to prevent conflicting physics responses. Existing indoor walls/furniture remain separate. The player moves in four cardinal directions; when two direction keys are held, the most recently pressed axis takes priority. Directional frames are explicitly loaded from Adam in down/left/right/up order.
+Navigation update: the campus uses one connected paving mask with merged obstacle rectangles under `World > Background collision`. Rectangles are triggers for inspection; movement uses the same mask to prevent conflicting physics responses. Existing indoor walls/furniture remain separate. The player moves in four cardinal directions; when two direction keys are held, the most recently pressed axis takes priority. Directional frames are explicitly loaded from Adam in down/left/right/up order.
 
 Building 60 exit interaction is separate from the entry spawn and located in the lower-right lobby near the planter, marked `ทางออก [E]`.
+
+The southeast stage/plaza is replaced by a pixel-art sports stadium with a football pitch, red running track and covered grandstand. `CampusStadiumLayout` traces the perspective of the visible running track and defines solid goal/stand/light bounds. The old flowerbed blocker is removed. `CampusStadiumBuilder.Validate` checks every obstacle and searches from the original player spawn using the full hero footprint to prove the west gate, field and both track straights are reachable. Generated mask colliders remain editable under `World > Background collision`, with named stadium solids alongside them. The full campus texture is edited directly; the world, overview and mini map share it, with no stadium overlay or paving-strip sprites. Artwork provenance and the generation prompt are in `unity/Assets/Docs/STADIUM_ART.md`.

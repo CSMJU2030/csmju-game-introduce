@@ -15,7 +15,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
 
     private enum ScreenState { Title, Playing, Dialogue, Puzzle, Combat, Surprise, Paused, Ending }
     private static readonly string[] BadgeNames = { "Programming Badge", "Database Badge", "Web & Software Badge", "AI/Data Badge", "IoT Badge", "Teamwork Badge" };
-    private static readonly string[] ZoneNames = { "Welcome Zone", "Curriculum Hall", "Software Lab", "AI & Data Cave", "IoT Garden" };
+    private static readonly string[] ZoneNames = { "Welcome Zone", "Curriculum Hall", "Software Lab", "AI & Data Cave", "IoT Garden", "สนามกีฬา" };
     private readonly HashSet<string> badges = new HashSet<string>();
     private readonly HashSet<string> completed = new HashSet<string>();
     private ScreenState state = ScreenState.Title;
@@ -47,6 +47,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 1f;
+        UpdateActorLayers();
         thaiRegular = Resources.Load<Font>("Fonts/Prompt-Regular");
         thaiSemibold = thaiRegular;
         if(buildingInterior != null) buildingInterior.SetActive(false);
@@ -167,6 +168,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private int ZoneAt(Vector2 position)
     {
         if (insideBuilding || buildingInterior != null && Vector2.Distance(position, buildingEntrance) < 3.4f) return 1;
+        if(CampusStadiumLayout.MapUv.Contains(new Vector2(Mathf.InverseLerp(mapMin.x,mapMax.x,position.x),Mathf.InverseLerp(mapMin.y,mapMax.y,position.y))))return 5;
         if (!campusOverview) return Mathf.Clamp(Mathf.FloorToInt((position.x - mapMin.x) / 14f), 0, 4);
         int closest = 0; float distance = float.MaxValue;
         for (int i = 0; i < Mathf.Min(5, npcs.Length); i++)
@@ -287,9 +289,9 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private void DrawTitle()
     {
         Dim(); Panel(new Rect(220, 78, 840, 570));
-        CampusOutlinedText.Label(new Rect(285, 122, 710, 60), "CSMJU QUEST", titleStyle);
+        CampusOutlinedText.Label(new Rect(285, 122, 710, 60), "CSMJU INTRODUCE", titleStyle);
         CampusOutlinedText.Label(new Rect(285, 184, 710, 46), "Digital Campus Adventure", headingStyle);
-        CampusOutlinedText.Label(new Rect(285, 246, 710, 190), "รับบทนักศึกษาใหม่ สำรวจโลก CS บนชั้น 6 อาคารแม่โจ้ 60 ปี\nเดินทางผ่าน 5 โซน พบรุ่นพี่และอาจารย์ ทำเควสต์ และสะสม Skill Badge ให้ครบ 6 ชิ้น\n\nProgramming · Database · Full-stack · AI/Data · IoT · Teamwork", bodyStyle);
+        CampusOutlinedText.Label(new Rect(285, 246, 710, 190), "ลองเป็นนักศึกษาใหม่ สำรวจห้องเรียนและห้องแล็บ พบรุ่นพี่และอาจารย์\nฝึกคิดเป็นขั้นตอนและแก้ปัญหาผ่านเควสต์ เพื่อค้นหาทักษะ CS ที่คุณสนใจ\n\nProgramming · Database · Web · AI/Data · IoT · Teamwork", bodyStyle);
         CampusOutlinedText.Label(new Rect(285, 444, 710, 50), "WASD / ลูกศร เดิน   •   E คุย   •   Tab แผนที่   •   Esc หยุดเกม", smallStyle);
         CampusOutlinedText.Label(new Rect(285, 607, 710, 26), "Campus: AI-assisted · Modern Interiors: LimeZu · Battlers: supplied pack", smallStyle);
         if (CampusOutlinedText.Button(new Rect(464, 530, 352, 60), "เริ่มผจญภัย", buttonStyle)) StartGame();
@@ -299,7 +301,7 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     {
         if (insideBuilding) { DrawInteriorHud(); return; }
         Panel(new Rect(16, 16, 350, 108));
-        CampusOutlinedText.Label(new Rect(34, 26, 275, 30), "CSMJU QUEST", headingStyle);
+        CampusOutlinedText.Label(new Rect(34, 26, 314, 32), "CSMJU INTRODUCE", headingStyle);
         CampusOutlinedText.Label(new Rect(34, 74, 172, 34), "Badges  " + badges.Count + "/6", badgeStyle);
         if (CampusOutlinedText.Button(new Rect(218, 68, 132, 40), "แบดจ์ [I]", buttonStyle)) inventoryOpen = !inventoryOpen;
         if (inventoryOpen)

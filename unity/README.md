@@ -1,4 +1,4 @@
-# CSMJU Quest: Digital Campus Adventure
+# CSMJU Introduce: Digital Campus Adventure
 
 Unity 2D top-down RPG for introducing Computer Science at Maejo University through quests, NPC conversations, short puzzles and skill badges. This project keeps scene content as editable Unity objects and uses one small WebGL scene.
 

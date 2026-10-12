@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "CSMJU Quest: Digital Campus Adventure - independent game introduce consuming CSMJU2030 Core Hub identity (RS256 + JWKS)",
+  "description": "CSMJU Introduce: Digital Campus Adventure - independent game introduce consuming CSMJU2030 Core Hub identity (RS256 + JWKS)",
   "license": "MIT",
   "private": true,
   "scripts": {
