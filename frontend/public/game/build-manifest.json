@@ -1,12 +1,12 @@
 {
   "files": {
-    "Build/0eae5d1c6875488623a73a0c9ce24b04.data.unityweb": "0dd2fb17958abc627d0558065ad3e5c9cdfd804fb2aa07b6fbcfcb3470f9c69f",
+    "Build/0b0b478a7e420770f343247dafaeacb4.data.unityweb": "3809bed6c088f4a12a8296a59636149af7ce1696c580ff2b838169553462709c",
     "Build/813a9b582d4eeeacb8b442b9bdd46ff1.loader.js": "f879bbd4bedd074c14757533d9bc36db9e28190b476a4fc54f1389570d8a6c32",
-    "Build/97a95c40565fab4e546dafce313700fd.wasm.unityweb": "42ea1063cbe644a2b3f61c323d5beb9ea34880675a2cbd023fe01f3a80f46039",
+    "Build/a6cd6d6faf93ad021490b911762b95f2.wasm.unityweb": "83667f804168f0dcd31fb9ae1ee6f8adb6629cc2716ee8fa5f61192e3b245af9",
     "Build/campus.framework.js": "bfb3a77ada08f2f14aef8a5b3d4e21d5adea6d6a09718dee8bc78e495a616494",
     "CREDITS.md": "53f30c90c9657065460b9767f299ac192e8bc3d82b9714940cbd578afafeaf1f",
     "Prompt-OFL.txt": "1d08c63944e639bbfe8a1b81e3c6a63836806c126b3573b9cda0db83fd27ffe9",
     "Prompt-Regular.ttf": "dbd497803cec3caffbc6b7f599ca6fed8beea0ed7e0ad1e098130c5ebbc4fd42",
-    "index.html": "36ed7aa5dccd2ed3001c116b9daf4f48daf005ef44b654fa72193a8cfca08057"
+    "index.html": "7066685ee7ccd6d777f746e7204962ee1f0de950c58c995062f40169bd6df6f4"
   }
 }

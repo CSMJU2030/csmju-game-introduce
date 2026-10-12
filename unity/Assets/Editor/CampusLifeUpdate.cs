@@ -51,7 +51,7 @@ public static class CampusLifeUpdate
         canopy.name="Trees · foreground";
         var canopyRenderer=canopy.GetComponent<SpriteRenderer>();if(canopyRenderer==null)canopyRenderer=canopy.gameObject.AddComponent<SpriteRenderer>();
         canopyRenderer.sprite=ground.sprite;canopyRenderer.drawMode=ground.drawMode;canopyRenderer.size=ground.size;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=1;
-        game.playerRenderer.sortingOrder=5;
+        game.playerRenderer.sortingOrder=10;
         foreach(var npc in game.npcs) if(npc!=null) {
             // The legacy ring was centred at the sprite pivot (the face), not the feet.
             // The nearby E prompt already identifies interactable NPCs.
@@ -145,7 +145,7 @@ public static class CampusLifeUpdate
         if(game.walkSprites.Length!=24)throw new Exception("Expected six frames for each of four directions");
         UnityEngine.Object.DestroyImmediate(image);game.groundMask=mask;EditorUtility.SetDirty(mask);
         var maps=game.buildingInterior.GetComponentsInChildren<Tilemap>(true).Where(m=>m!=null).ToArray();
-        CampusCollisionBuilder.ApplyPixelMaterials(game,ground,canopyRenderer,maps);
+        CampusCollisionBuilder.RestoreOriginalMaterials(game,ground,maps);
         var background=maps.FirstOrDefault(m=>m.name=="layer0");
         if(background!=null) background.GetComponent<TilemapRenderer>().enabled=false;
         var room=maps.First(m=>m.name=="layer1"); var furniture=maps.First(m=>m.name=="layer2");

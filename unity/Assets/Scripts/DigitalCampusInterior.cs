@@ -53,12 +53,10 @@ public sealed partial class DigitalCampusGame
         }
         return true;
     }
-    // The outdoor canopy is a colour mask of the whole map. Keep actors above
-    // it so foliage cannot erase their heads while their feet are on paving.
-    // Indoors, furniture remains above actors and collision protects its footprint.
+    // Keep the hero above all world sprites, including tall indoor furniture.
     private void UpdateActorLayers()
     {
-        if(playerRenderer != null) playerRenderer.sortingOrder=insideBuilding?2:5;
+        if(playerRenderer != null) playerRenderer.sortingOrder=10;
         foreach(var npc in npcs) if(npc != null) {
             if(npc.spriteRenderer != null) npc.spriteRenderer.sortingOrder=insideBuilding?1:4;
             foreach(var label in npc.GetComponentsInChildren<MeshRenderer>(true))

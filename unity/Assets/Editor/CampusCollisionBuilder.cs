@@ -83,17 +83,14 @@ public static class CampusCollisionBuilder
                 solid.Add(Box(root.transform,SpriteBounds(map,cell),"Furniture "+map.GetTile(cell).name+" "+cell));
         game.interiorColliders=solid.ToArray();game.interiorFurniture=Array.Empty<Rect>();game.interiorWalkableFloors=floors.ToArray();
     }
-    public static void ApplyPixelMaterials(DigitalCampusGame game,SpriteRenderer ground,SpriteRenderer canopy,Tilemap[] maps)
+    public static void RestoreOriginalMaterials(DigitalCampusGame game,SpriteRenderer ground,Tilemap[] maps)
     {
-        Material Get(string name,Vector4 grid) {
-            var shader=Shader.Find("Campus/8 Bit Background");if(shader==null)throw new Exception("8-bit shader missing");
-            var path="Assets/Art/Campus/"+name+".mat";var material=AssetDatabase.LoadAssetAtPath<Material>(path);
-            if(material==null){material=new Material(shader);AssetDatabase.CreateAsset(material,path);}
-            material.shader=shader;material.SetVector("_PixelGrid",grid);EditorUtility.SetDirty(material);return material;
+        var material=AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+        if(material==null)throw new Exception("Default sprite material missing");
+        ground.sharedMaterial=material;game.campusMapMaterial=null;
+        foreach(var map in maps.Where(m=>m!=null)) {
+            var renderer=map.GetComponent<TilemapRenderer>();
+            if(renderer!=null)renderer.sharedMaterial=material;
         }
-        game.campusMapMaterial=Get("Campus 8 Bit",new Vector4(512,288,0,0));ground.sharedMaterial=game.campusMapMaterial;
-        canopy.sharedMaterial.SetVector("_PixelGrid",new Vector4(512,288,0,0));EditorUtility.SetDirty(canopy.sharedMaterial);
-        var indoor=Get("Interior 8 Bit",Vector4.zero);
-        foreach(var map in maps.Where(m=>m!=null)){var renderer=map.GetComponent<TilemapRenderer>();if(renderer!=null)renderer.sharedMaterial=indoor;}
     }
 }

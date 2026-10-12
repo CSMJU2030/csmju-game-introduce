@@ -12496,7 +12496,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b384edb81ebd742cb970cdf33c7c3bf0, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -17489,7 +17489,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 764f0f0f050c046e6be760f906ef5952, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -24271,7 +24271,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 10
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7061717714933810776, guid: f78206ed6a17841ae965801eb6bb2003, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -43377,7 +43377,7 @@ MonoBehaviour:
   - {fileID: 1536774556}
   groundMask: {fileID: 11400000, guid: e49fbd4ea254c454bb36c3d182133982, type: 2}
   campusMapTexture: {fileID: 2800000, guid: 195523a37ff09447b9a140ed60ef1d83, type: 3}
-  campusMapMaterial: {fileID: 2100000, guid: 764f0f0f050c046e6be760f906ef5952, type: 2}
+  campusMapMaterial: {fileID: 0}
   outdoorSolids:
   - {fileID: 1103429720}
   - {fileID: 1597968500}
@@ -45504,7 +45504,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b384edb81ebd742cb970cdf33c7c3bf0, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -53480,7 +53480,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b384edb81ebd742cb970cdf33c7c3bf0, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
