@@ -29,21 +29,27 @@ public sealed partial class DigitalCampusGame
                 center+half,center-half,center+new Vector2(half.x,-half.y),center+new Vector2(-half.x,half.y)};
         }
     }
-    private bool InsideFloor(Vector2 point)
+    private Rect FootprintAt(Vector2 point)
     {
         var offsets=FootOffsets;
-        var footprint = new Bounds(point+offsets[0], new Vector3(Mathf.Abs(offsets[1].x-offsets[2].x),Mathf.Abs(offsets[3].y-offsets[4].y),1));
-        foreach(var collider in interiorColliders)
-            if(collider != null && collider.enabled && collider.gameObject.activeInHierarchy
-                && collider.bounds.Intersects(footprint)) return false;
-        foreach (var offset in offsets)
-        {
-            Vector2 sample = point + offset;
-            foreach(var collider in interiorColliders) if(collider != null && collider.OverlapPoint(sample)) return false;
-            foreach (var obstacle in interiorFurniture) if (obstacle.Contains(sample)) return false;
-            bool onFloor = false;
-            foreach (var floor in interiorWalkableFloors) onFloor |= floor.Contains(sample);
-            if (!onFloor) return false;
+        var size=new Vector2(Mathf.Abs(offsets[1].x-offsets[2].x),Mathf.Abs(offsets[3].y-offsets[4].y));
+        return new Rect(point+offsets[0]-size*.5f,size);
+    }
+    private static bool TouchesObstacle(Rect area,Collider2D obstacle)
+    {
+        if(obstacle==null || !obstacle.enabled || !obstacle.gameObject.activeInHierarchy)return false;
+        var bounds=obstacle.bounds;
+        return area.Overlaps(new Rect((Vector2)bounds.min,(Vector2)bounds.size));
+    }
+    private bool InsideFloor(Vector2 point)
+    {
+        var footprint=FootprintAt(point);
+        foreach(var obstacle in interiorColliders)if(TouchesObstacle(footprint,obstacle))return false;
+        foreach(var obstacle in interiorFurniture)if(footprint.Overlaps(obstacle))return false;
+        foreach(var offset in FootOffsets) {
+            bool onFloor=false;var sample=point+offset;
+            foreach(var floor in interiorWalkableFloors)if(floor.Contains(sample)){onFloor=true;break;}
+            if(!onFloor)return false;
         }
         return true;
     }

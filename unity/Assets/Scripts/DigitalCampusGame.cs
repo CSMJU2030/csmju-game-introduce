@@ -136,7 +136,9 @@ public sealed partial class DigitalCampusGame : MonoBehaviour
     private bool CanWalk(Vector2 point)
     {
         if (insideBuilding) return InsideFloor(point);
-        // Sprite pivot is at the feet. A small footprint follows the visible ground.
+        var footprint=FootprintAt(point);
+        foreach(var obstacle in outdoorSolids)if(TouchesObstacle(footprint,obstacle))return false;
+        if(groundMask!=null)return !groundMask.Blocks(footprint,mapMin,mapMax);
         foreach(var offset in FootOffsets) if(!OnGround(point + offset)) return false;
         return true;
     }
