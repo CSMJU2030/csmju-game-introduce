@@ -29,15 +29,15 @@ public static class CampusOutlinedText
         rt.anchoredPosition=new Vector2(p.x,-p.y);rt.sizeDelta=new Vector2(rect.width*right.magnitude,rect.height*down.magnitude);
         rt.localRotation=Quaternion.Euler(0,0,-Mathf.Atan2(right.y,right.x)*Mathf.Rad2Deg);rt.SetAsLastSibling();
     }
-    public static void Picture(Rect rect,Texture texture,ScaleMode scale=ScaleMode.StretchToFill){
+    public static void Picture(Rect rect,Texture texture,ScaleMode scale=ScaleMode.StretchToFill,Material material=null){
         var uv=new Rect(0,0,1,1);
         if(scale==ScaleMode.ScaleAndCrop){float source=(float)texture.width/texture.height,target=rect.width/rect.height;if(source>target){uv.width=target/source;uv.x=(1-uv.width)/2;}else{uv.height=source/target;uv.y=(1-uv.height)/2;}}
-        PictureUV(rect,texture,uv);
+        PictureUV(rect,texture,uv,material);
     }
-    public static void PictureUV(Rect rect,Texture texture,Rect uv){
+    public static void PictureUV(Rect rect,Texture texture,Rect uv,Material material=null){
         if(Event.current.type!=EventType.Repaint)return;EnsureCanvas();
         if(imageUsed==images.Count){var go=new GameObject("Panel",typeof(RectTransform));go.transform.SetParent(canvas.transform,false);var im=go.AddComponent<RawImage>();im.raycastTarget=false;images.Add(im);}
-        var image=images[imageUsed++];image.gameObject.SetActive(true);Place(image.rectTransform,rect);image.texture=texture;image.uvRect=uv;image.color=GUI.color;
+        var image=images[imageUsed++];image.gameObject.SetActive(true);Place(image.rectTransform,rect);image.texture=texture;image.uvRect=uv;image.color=GUI.color;image.material=material;
     }
     public static bool Button(Rect rect,GUIContent content,GUIStyle style)=>Button(rect,content.text,style);
     public static void Label(Rect rect,string text,GUIStyle style){

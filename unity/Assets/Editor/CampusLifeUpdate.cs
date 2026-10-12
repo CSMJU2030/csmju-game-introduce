@@ -51,7 +51,7 @@ public static class CampusLifeUpdate
         canopy.name="Trees · foreground";
         var canopyRenderer=canopy.GetComponent<SpriteRenderer>();if(canopyRenderer==null)canopyRenderer=canopy.gameObject.AddComponent<SpriteRenderer>();
         canopyRenderer.sprite=ground.sprite;canopyRenderer.drawMode=ground.drawMode;canopyRenderer.size=ground.size;canopyRenderer.sharedMaterial=canopyMaterial;canopyRenderer.sortingOrder=1;
-        game.playerRenderer.sortingOrder=5;
+        game.playerRenderer.sortingOrder=10;
         foreach(var npc in game.npcs) if(npc!=null) {
             // The legacy ring was centred at the sprite pivot (the face), not the feet.
             // The nearby E prompt already identifies interactable NPCs.
@@ -63,6 +63,7 @@ public static class CampusLifeUpdate
         game.cameraViewSize=5.2f; game.campusOverview=false;
         game.campusMapTexture=world.GetComponent<SpriteRenderer>().sprite.texture;
         CampusStadiumBuilder.Apply(game,world.transform);
+        CampusCollisionBuilder.BuildOutdoor(game,world.transform);
         const string maskPath="Assets/Resources/Art/Campus Ground Mask.asset";
         var mask=AssetDatabase.LoadAssetAtPath<CampusGroundMask>(maskPath);
         if(mask==null) { mask=ScriptableObject.CreateInstance<CampusGroundMask>();AssetDatabase.CreateAsset(mask,maskPath); }
@@ -81,7 +82,7 @@ public static class CampusLifeUpdate
             float top=1-v;
             bool building=(u>.095f&&u<.446f&&top<.342f)||(u>.595f&&u<.885f&&top<.386f);
             var mapPoint=new Vector2(u,v);
-            allowed[y*mask.width+x]=!CampusStadiumLayout.IsSolid(mapPoint)
+            allowed[y*mask.width+x]=!CampusStadiumLayout.IsSolid(mapPoint) && !CampusCollisionBuilder.OutdoorBlocked(mapPoint)
                 && (CampusStadiumLayout.OnTrack(mapPoint) || votes>=5 && !building);
         }
         // Keep only paving connected to the spawn, excluding isolated roof/rock pixels.
@@ -143,7 +144,8 @@ public static class CampusLifeUpdate
         game.walkSprites=AssetDatabase.LoadAllAssetsAtPath("Assets/Art/ModernCampus/Adam.png").OfType<Sprite>().OrderBy(sprite=>sprite.name).ToArray();
         if(game.walkSprites.Length!=24)throw new Exception("Expected six frames for each of four directions");
         UnityEngine.Object.DestroyImmediate(image);game.groundMask=mask;EditorUtility.SetDirty(mask);
-        var maps=game.buildingInterior.GetComponentsInChildren<Tilemap>(true);
+        var maps=game.buildingInterior.GetComponentsInChildren<Tilemap>(true).Where(m=>m!=null).ToArray();
+        CampusCollisionBuilder.RestoreOriginalMaterials(game,ground,maps);
         var background=maps.FirstOrDefault(m=>m.name=="layer0");
         if(background!=null) background.GetComponent<TilemapRenderer>().enabled=false;
         var room=maps.First(m=>m.name=="layer1"); var furniture=maps.First(m=>m.name=="layer2");
@@ -151,31 +153,15 @@ public static class CampusLifeUpdate
         // Discard leftover editor grid tiles outside the authored building footprint.
         foreach(var map in maps) foreach(var cell in map.cellBounds.allPositionsWithin)
             if(cell.x<89 || cell.x>115 || cell.y< -8 || cell.y>9) map.SetTile(cell,null);
-        var previous=game.buildingInterior.transform.Find("Collision · authored interior");
-        if(previous!=null) UnityEngine.Object.DestroyImmediate(previous.gameObject);
-        var collision=new GameObject("Collision · authored interior");collision.transform.SetParent(game.buildingInterior.transform,false);
-        var solid=new List<Collider2D>();var floors=new List<Rect>();var floor=room.GetTile(new Vector3Int(90,0,0));
-        void Block(Tilemap map,Vector3Int cell,bool foot) {
-            var a=map.transform.TransformPoint((Vector3)cell);var b=map.transform.TransformPoint((Vector3)(cell+new Vector3Int(1,1,0)));
-            float width=Mathf.Abs(b.x-a.x),height=Mathf.Abs(b.y-a.y);
-            var go=new GameObject((foot?"Furniture feet ":"Wall ")+cell);go.transform.SetParent(collision.transform,false);
-            go.transform.position=new Vector3((a.x+b.x)*.5f,(a.y+b.y)*.5f,0);
-            var box=go.AddComponent<BoxCollider2D>();box.size=new Vector2(width*(foot?.86f:1),height*(foot?.9f:1));solid.Add(box);
-        }
-        foreach(var cell in room.cellBounds.allPositionsWithin) {
-            var tile=room.GetTile(cell);if(tile==null) continue;
-            if(tile==floor) { var a=room.transform.TransformPoint((Vector3)cell);var b=room.transform.TransformPoint((Vector3)(cell+new Vector3Int(1,1,0)));floors.Add(new Rect(a.x,a.y,b.x-a.x,b.y-a.y)); }
-            else Block(room,cell,false);
-        }
-        foreach(var cell in furniture.cellBounds.allPositionsWithin)
-            if(furniture.HasTile(cell)) Block(furniture,cell,true);
-        game.interiorColliders=solid.ToArray();game.interiorFurniture=Array.Empty<Rect>();game.interiorWalkableFloors=floors.ToArray();
+        CampusCollisionBuilder.BuildInterior(game,room,maps);
+        game.buildingInterior.SetActive(true);Physics2D.SyncTransforms();
         game.playerCollider.size=new Vector2(.42f,.24f);
         var old=game.buildingInterior.transform.Find("Campus students");if(old!=null)UnityEngine.Object.DestroyImmediate(old.gameObject);
         var studentsRoot=new GameObject("Campus students");studentsRoot.transform.SetParent(game.buildingInterior.transform,false);
-        bool Clear(Vector2 p) => floors.Any(r=>r.Contains(p)) && !solid.OfType<BoxCollider2D>().Any(c=>new Rect((Vector2)c.transform.position-c.size*.5f,c.size).Overlaps(new Rect(p-Vector2.one*.25f,Vector2.one*.5f)));
+        bool Clear(Vector2 p) => game.AmbientCanWalk(p);
         // Keep quest NPCs in the open aisles, reachable from the entrance.
         var reachable=new HashSet<Vector2>();var pending=new Queue<Vector2>();
+        if(!Clear(game.interiorSpawn))throw new Exception("Interior spawn overlaps furniture");
         pending.Enqueue(game.interiorSpawn);reachable.Add(game.interiorSpawn);
         while(pending.Count>0) {
             var point=pending.Dequeue();
@@ -208,8 +194,11 @@ public static class CampusLifeUpdate
             var student=go.AddComponent<CampusStudent>();student.game=game;student.frames=frames;student.route=route;student.studentName=names[i];
             student.chat=new[]{"ไปทำโปรเจกต์ที่แล็บกันไหม?","วันนี้เราเรียนเขียนโปรแกรมกัน","เดี๋ยวไปถามพี่ดาต้ากันนะ"};students.Add(student);
         }
-        game.students=students.ToArray();game.buildingInterior.SetActive(false);
+        game.students=students.ToArray();
+        CampusCollisionValidation.ValidateInterior(game,maps,reachable);
+        game.buildingInterior.SetActive(false);
         Physics2D.SyncTransforms();CampusStadiumBuilder.Validate(game);
+        CampusCollisionValidation.ValidateOutdoor(game);
         EditorUtility.SetDirty(game);EditorSceneManager.MarkSceneDirty(scene);EditorSceneManager.SaveScene(scene);AssetDatabase.SaveAssets();
     }
 }

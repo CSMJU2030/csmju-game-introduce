@@ -6,15 +6,10 @@ public sealed partial class DigitalCampusGame
     public CampusStudent[] students=System.Array.Empty<CampusStudent>();
     public CampusGroundMask groundMask;
     public Texture2D campusMapTexture;
+    public Material campusMapMaterial;
+    public Collider2D[] outdoorSolids=System.Array.Empty<Collider2D>();
     public bool AmbientMoving => insideBuilding && state==ScreenState.Playing && !mapOpen && !inventoryOpen;
-    public bool AmbientCanWalk(Vector2 p) {
-        foreach(var d in new[]{Vector2.zero,new Vector2(.18f,.18f),new Vector2(-.18f,-.18f),new Vector2(-.18f,.18f),new Vector2(.18f,-.18f)}) {
-            var sample=p+d;
-            if(!interiorWalkableFloors.Any(r=>r.Contains(sample))) return false;
-            if(interiorColliders.Any(c=>c!=null && c.enabled && c.gameObject.activeInHierarchy && c.OverlapPoint(sample))) return false;
-        }
-        return true;
-    }
+    public bool AmbientCanWalk(Vector2 p) => InsideFloor(p);
     private void DrawLifeOverlay() {
         if(state!=ScreenState.Playing || mapOpen || inventoryOpen) return;
         if(insideBuilding) {
@@ -45,7 +40,7 @@ public sealed partial class DigitalCampusGame
         DrawCampusMap(r,true);
     }
     private void DrawCampusMap(Rect r,bool cameraFrame) {
-        CampusOutlinedText.Picture(r,campusMapTexture);
+        CampusOutlinedText.Picture(r,campusMapTexture,ScaleMode.StretchToFill,campusMapMaterial);
         Vector2 At(Vector2 world)=>new Vector2(r.x+Mathf.InverseLerp(mapMin.x,mapMax.x,world.x)*r.width,r.y+(1-Mathf.InverseLerp(mapMin.y,mapMax.y,world.y))*r.height);
         foreach(var npc in npcs) if(npc!=null && npc.gameObject.activeInHierarchy && npc.npcId!="bug") {
             var p=At(npc.transform.position); Fill(new Rect(p.x-3,p.y-3,6,6),new Color(1,.8f,.2f));
